@@ -1,11 +1,12 @@
-== 1 minute primer ==
+## 1 minute primer
 
-Given you have a Javabean:
+Given a Javabean:
 
     ```java
     public class Person {
         private String name;
         private int age;
+        private List<Person> friends;
 
         public void setName(String name) {
             this.name = name;
@@ -13,6 +14,10 @@ Given you have a Javabean:
 
         public void setAge(int age) {
             this.age = age;
+        }
+
+        public void setFriends(List<Friend> friends) {
+            this.friends = friends;
         }
 
         ... getters omitted for brevity ...
@@ -25,25 +30,38 @@ And a builder:
     public interface PersonBuilder extends Builder<Person> {
         PersonBuilder withName(String name);
         PersonBuilder withAge(int age);
+        PersonBuilder withFriends(PersonBuilder... friends);
     }
     ```
 
 Enjoy an automatic implementation of your builder:
 
     ```java
-    PersonBuilder builder = ReflectionBuilder.implementationFor(PersonBuilder.class).create();
-    Person person = builder.withName("John Doe").withAge(44).build();
+    public static PersonBuilder aPerson() {
+        return ReflectionBuilder.implementationFor(PersonBuilder.class).create();
+    }
+
+    ...
+
+    Person person = aPerson()
+                        .withName("John Doe")
+                        .withAge(44)
+                        .withFriends(
+                            aPerson().withName("Smitty Smith"),
+                            aPerson().withName("Joe Anderson")
+                        )
+                        .build();
     ```
 
 Yay! No code!
 
-== The problem ==
+## The problem
 
 Writing (Fluent Interfaces)[http://en.wikipedia.org/wiki/Fluent_interface] for creating beans in Java is cumbersome.
 It requires the programmer to write a lot of boilerplate code to implement a builder for simple javabeans. This project
 aims at facilitating the implementation of such patterns by providing an automatic implementation of builder interfaces.
 
-== The solution ==
+## The solution
 
 By using the Java Reflection API, this library will provide
 a dynamic implementation of you builder interface that will be able to build the target object.

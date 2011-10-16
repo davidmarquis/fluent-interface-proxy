@@ -7,6 +7,7 @@ import java.util.Set;
 public class Person {
     private String name;
     private int age;
+    private Person partner;
     private List<Person> friends;
     private Set<String> surnames;
     private Person[] parents;
@@ -27,6 +28,14 @@ public class Person {
 
     public void setAge(int age) {
         this.age = age;
+    }
+
+    public Person getPartner() {
+        return partner;
+    }
+
+    public void setPartner(Person partner) {
+        this.partner = partner;
     }
 
     public List<Person> getFriends() {

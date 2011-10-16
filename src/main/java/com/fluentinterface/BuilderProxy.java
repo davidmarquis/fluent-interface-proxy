@@ -83,6 +83,8 @@ public class BuilderProxy implements InvocationHandler {
             if (valueAsCollection != null) {
                 valueAsCollection = buildBuildersInCollection(valueAsCollection);
                 value = transformCollectionToTargetTypeIfPossible(value, valueAsCollection, targetPropertyType);
+            } else {
+                value = buildIfBuilderInstance(value);
             }
         }
 
@@ -118,20 +120,34 @@ public class BuilderProxy implements InvocationHandler {
     }
 
     private Collection<Object> buildBuildersInCollection(Collection<Object> collectionWithBuilders) {
-        if (builderDelegate == null) {
+        if (!hasBuilderDelegate()) {
             return collectionWithBuilders;
         }
 
         Collection<Object> transformed = new ArrayList<Object>(collectionWithBuilders.size());
 
         for (Object element : collectionWithBuilders) {
-            if (builderDelegate.isBuilderInstance(element)) {
-                element = builderDelegate.build(element);
-            }
+            element = buildIfBuilderInstance(element);
             transformed.add(element);
         }
 
         return transformed;
+    }
+
+    private boolean hasBuilderDelegate() {
+        return (builderDelegate != null);
+    }
+
+    private Object buildIfBuilderInstance(Object value) {
+        if (!hasBuilderDelegate()) {
+            return value;
+        }
+
+        if (builderDelegate.isBuilderInstance(value)) {
+            return builderDelegate.build(value);
+        }
+
+        return value;
     }
 
     private Collection<Object> convertToCollectionIfMultiValued(Object value) {

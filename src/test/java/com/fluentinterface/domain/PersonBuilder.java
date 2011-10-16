@@ -15,6 +15,8 @@ public interface PersonBuilder extends Builder<Person> {
 
     PersonBuilder withAge(String age);
 
+    PersonBuilder withPartner(PersonBuilder diane);
+
     PersonBuilder withSurnames(String... surnames);
 
     PersonBuilder withFriends(Person... friends);

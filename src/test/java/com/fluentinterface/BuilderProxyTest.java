@@ -12,6 +12,7 @@ import java.util.Arrays;
 
 import static com.fluentinterface.ReflectionBuilder.implementationFor;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.collection.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
 
@@ -156,6 +157,18 @@ public class BuilderProxyTest {
                 .build();
 
         assertThat(built.getAgesOfMarriages(), is(new int[] {23, 45}));
+    }
+
+    @Test
+    public void shouldSetPropertyValueBuilderToObject() {
+
+        Person built = personBuilder
+                .withPartner(
+                        aPerson().withName("Diane")
+                ).build();
+
+        assertThat(built.getPartner(), notNullValue());
+        assertThat(built.getPartner().getName(), is("Diane"));
     }
 
     @Test(expected = IllegalStateException.class)

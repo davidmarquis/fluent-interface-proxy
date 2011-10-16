@@ -16,7 +16,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.isNotNull;
 
 @RunWith(MockitoJUnitRunner.class)
-public class FluentInterfaceProxyTest {
+public class BuilderProxyTest {
 
     private PersonBuilder personBuilder;
 
@@ -26,14 +26,7 @@ public class FluentInterfaceProxyTest {
     }
 
     private PersonBuilder aPerson() {
-        try {
-            return FluentInterfaceProxy.implementBuilder(PersonBuilder.class);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return ReflectionBuilder.implementationFor(PersonBuilder.class).create();
     }
 
     @Test
@@ -183,7 +176,7 @@ public class FluentInterfaceProxyTest {
         personBuilder.something("fails").build();
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void shouldFailForUnsupportedCollectionTypes() {
 
         personBuilder.withQueue(new ArrayDeque()).build();

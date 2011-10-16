@@ -9,14 +9,8 @@ public class Person {
     private int age;
     private List<Person> friends;
     private Set<String> surnames;
-
     private Person[] parents;
-
     private int[] agesOfMarriages;
-
-    /**
-     * Note: Queues are not supported by the proxy builder.
-     */
     private Queue queue;
 
     public String getName() {

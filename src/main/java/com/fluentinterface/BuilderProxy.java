@@ -1,38 +1,37 @@
 package com.fluentinterface;
 
+import com.fluentinterface.builder.BuilderDelegate;
+import com.fluentinterface.utils.GenericsUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FluentInterfaceProxy implements InvocationHandler {
+public class BuilderProxy<B, T> implements InvocationHandler {
 
     private static final Pattern BUILDER_METHOD_PROPERTY_PATTERN = Pattern.compile("[a-z]+([A-Z].*)");
 
-    private Class<?> proxied;
-    private Class<?> builtClass;
+    private Class<B> proxied;
+    private Class<T> builtClass;
+    private BuilderDelegate builderDelegate;
     private Map<String, Object> propertiesToSet;
 
-    private FluentInterfaceProxy(Class<?> proxied) throws InstantiationException, IllegalAccessException {
-        this.proxied = proxied;
-        this.builtClass = extractBuiltClass(proxied);
+    BuilderProxy(Class<B> builderInterface, Class<T> builtClass, BuilderDelegate builderDelegate) {
+        this.proxied = builderInterface;
+        this.builtClass = builtClass;
+        this.builderDelegate = builderDelegate;
         this.propertiesToSet = new LinkedHashMap<String, Object>();
-    }
-
-    public static <T extends Builder<?>> T implementBuilder(Class<T> builderInterface) throws IllegalAccessException, InstantiationException {
-        InvocationHandler invokeHandler = new FluentInterfaceProxy(builderInterface);
-        return (T) Proxy.newProxyInstance(
-                builderInterface.getClassLoader(),
-                new Class[]{builderInterface},
-                invokeHandler);
     }
 
     public Object invoke(Object target, Method method, Object[] params) throws Throwable {
 
-        if (isSetter(method) && isSingleParams(params)) {
+        if (isSetter(method)) {
             String propertyBeingSet = extractPropertyNameFrom(method);
             Object valueForProperty = params[0];
 
@@ -63,20 +62,6 @@ public class FluentInterfaceProxy implements InvocationHandler {
         return false;
     }
 
-    private Class<?> extractBuiltClass(Class<?> proxied) {
-        Type[] genericInterfaces = proxied.getGenericInterfaces();
-        if (genericInterfaces != null && genericInterfaces.length == 1) {
-            Type genericType = genericInterfaces[0];
-            if (genericType instanceof ParameterizedType) {
-                ParameterizedType paramType = (ParameterizedType) genericType;
-                return (Class<?>) paramType.getActualTypeArguments()[0];
-            }
-        }
-
-        throw new IllegalArgumentException(String.format("Could not find generic type of %s", proxied));
-    }
-
-
     private Object createInstanceFromProperties() throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
         Object instance = builtClass.newInstance();
 
@@ -98,26 +83,27 @@ public class FluentInterfaceProxy implements InvocationHandler {
 
             if (valueAsCollection != null) {
                 valueAsCollection = buildBuildersInCollection(valueAsCollection);
-                value = transformCollectionToTargetType(valueAsCollection, targetPropertyType);
+                value = transformCollectionToTargetTypeIfPossible(value, valueAsCollection, targetPropertyType);
             }
         }
 
         PropertyUtils.setProperty(target, property, value);
     }
 
-    private Object transformCollectionToTargetType(Collection<Object> valueAsCollection, Class targetPropertyType) throws InstantiationException, IllegalAccessException {
-
-        if (isCollection(targetPropertyType)) {
-            Collection<Object> targetValue = createCollectionOfType(targetPropertyType);
-            targetValue.addAll(valueAsCollection);
-            return targetValue;
-        }
+    private Object transformCollectionToTargetTypeIfPossible(Object originalValue, Collection<Object> valueAsCollection,
+                                                             Class targetPropertyType) throws InstantiationException, IllegalAccessException {
 
         if (targetPropertyType.isArray()) {
             return collectionToArray(valueAsCollection, targetPropertyType);
         }
 
-        throw new IllegalArgumentException(String.format("Unrecognized multi-value class: [%s]", targetPropertyType));
+        Collection<Object> targetValue = createCollectionOfType(targetPropertyType);
+        if (targetValue != null) {
+            targetValue.addAll(valueAsCollection);
+            return targetValue;
+        }
+
+        return originalValue;
     }
 
     private Object collectionToArray(Collection<Object> valueAsCollection, Class targetPropertyType) {
@@ -132,12 +118,22 @@ public class FluentInterfaceProxy implements InvocationHandler {
         return createdArray;
     }
 
-    private Collection<Object> buildBuildersInCollection(Collection collectionWithBuilders) {
+    private Collection<Object> buildBuildersInCollection(Collection<Object> collectionWithBuilders) {
+        if (builderDelegate == null) {
+            return collectionWithBuilders;
+        }
+
         Collection<Object> transformed = new ArrayList<Object>(collectionWithBuilders.size());
+        Class<?> builderType = GenericsUtils.getGenericTypeOf(builderDelegate.getClass());
+
+        if (builderType == null) {
+            throw new IllegalStateException(String.format(
+                    "Could not find type of Builder from delegate: [%s].", builderDelegate.getClass()));
+        }
 
         for (Object element : collectionWithBuilders) {
-            if (element instanceof Builder) {
-                element = ((Builder) element).build();
+            if (builderType.isAssignableFrom(element.getClass())) {
+                element = builderDelegate.build(element);
             }
             transformed.add(element);
         }
@@ -191,16 +187,12 @@ public class FluentInterfaceProxy implements InvocationHandler {
                 return new HashSet<Object>();
             } else if (List.class.isAssignableFrom(clazz)) {
                 return new ArrayList<Object>();
-            } else {
-                throw new IllegalStateException(String.format("Collection interface [%s] is not supported.", clazz));
             }
+
+            return null;
         }
 
         return (Collection<Object>) clazz.newInstance();
-    }
-
-    private boolean isSingleParams(Object[] params) {
-        return params != null && params.length == 1;
     }
 
     private String extractPropertyNameFrom(Method method) {

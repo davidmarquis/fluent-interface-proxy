@@ -1,6 +1,6 @@
 package com.fluentinterface.domain;
 
-import com.fluentinterface.Builder;
+import com.fluentinterface.builder.Builder;
 
 import java.util.Collection;
 import java.util.Queue;
@@ -35,5 +35,6 @@ public interface PersonBuilder extends Builder<Person> {
     /** Method names must represent property name starting from first uppercase character. */
     PersonBuilder something(String name);
 
+    /** Queues are supported only for direct assignment (target class property must also be a Queue). */
     PersonBuilder withQueue(Queue queue);
 }

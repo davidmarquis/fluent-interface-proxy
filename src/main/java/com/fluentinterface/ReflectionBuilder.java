@@ -9,7 +9,9 @@ import java.lang.reflect.Proxy;
 
 public class ReflectionBuilder<T> {
 
-    private BuilderDelegate<?> builderDelegate;
+    private static BuilderDelegate defaultBuilderDelegate = new InternalBuilderAsSuperClassDelegate();
+
+    private BuilderDelegate<? super T> builderDelegate;
     private Class<T> builderInterface;
     private Class<?> builtClass;
 
@@ -21,19 +23,23 @@ public class ReflectionBuilder<T> {
 
         this.builderInterface = builderInterface;
         this.builtClass = implyBuiltClassFromImplementedInterface(builderInterface);
-        this.builderDelegate = new DefaultBuilderDelegate();
+        this.builderDelegate = defaultBuilderDelegate;
+    }
+
+    public static void setDefaultBuilderDelegate(BuilderDelegate delegate) {
+        defaultBuilderDelegate = delegate;
     }
 
     public static <T> ReflectionBuilder<T> implementationFor(Class<T> builderInterface) {
         return new ReflectionBuilder<T>(builderInterface);
     }
 
-    public ReflectionBuilder builds(Class<?> objectsOfType) {
+    public ReflectionBuilder<T> builds(Class<?> objectsOfType) {
         this.builtClass = objectsOfType;
         return this;
     }
 
-    public ReflectionBuilder with(BuilderDelegate builderDelegate) {
+    public ReflectionBuilder<T> withDelegate(BuilderDelegate<? super T> builderDelegate) {
         this.builderDelegate = builderDelegate;
         return this;
     }
@@ -41,23 +47,32 @@ public class ReflectionBuilder<T> {
     public T create() {
         if (builtClass == null) {
             throw new IllegalStateException(String.format(
-                    ""));
+                    "Could not imply class being built by builder [%s]. " +
+                            "If the interface does not extend [%s], you must explicitely set the type of object being built using the 'with(class)' method.",
+                    builderInterface, Builder.class
+            ));
         }
 
-        InvocationHandler invokeHandler = new BuilderProxy(builderInterface, builtClass, builderDelegate);
+        InvocationHandler handler = new BuilderProxy(builderInterface, builtClass, builderDelegate);
+
         return (T) Proxy.newProxyInstance(
                 builderInterface.getClassLoader(),
                 new Class[]{builderInterface},
-                invokeHandler);
+                handler);
     }
 
     private Class<?> implyBuiltClassFromImplementedInterface(Class<?> proxied) {
         return GenericsUtils.getGenericTypeOf(proxied);
     }
 
-    private static class DefaultBuilderDelegate implements BuilderDelegate<Builder> {
+    private static class InternalBuilderAsSuperClassDelegate implements BuilderDelegate<Builder> {
+
         public Object build(Builder builder) {
             return builder.build();
+        }
+
+        public boolean isBuilderInstance(Object value) {
+            return value instanceof Builder;
         }
     }
 }

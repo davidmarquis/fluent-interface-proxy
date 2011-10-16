@@ -1,7 +1,6 @@
 package com.fluentinterface;
 
 import com.fluentinterface.builder.BuilderDelegate;
-import com.fluentinterface.utils.GenericsUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 
 import java.beans.PropertyDescriptor;
@@ -13,16 +12,16 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class BuilderProxy<B, T> implements InvocationHandler {
+public class BuilderProxy implements InvocationHandler {
 
     private static final Pattern BUILDER_METHOD_PROPERTY_PATTERN = Pattern.compile("[a-z]+([A-Z].*)");
 
-    private Class<B> proxied;
-    private Class<T> builtClass;
+    private Class proxied;
+    private Class  builtClass;
     private BuilderDelegate builderDelegate;
     private Map<String, Object> propertiesToSet;
 
-    BuilderProxy(Class<B> builderInterface, Class<T> builtClass, BuilderDelegate builderDelegate) {
+    BuilderProxy(Class builderInterface, Class builtClass, BuilderDelegate builderDelegate) {
         this.proxied = builderInterface;
         this.builtClass = builtClass;
         this.builderDelegate = builderDelegate;
@@ -124,15 +123,9 @@ public class BuilderProxy<B, T> implements InvocationHandler {
         }
 
         Collection<Object> transformed = new ArrayList<Object>(collectionWithBuilders.size());
-        Class<?> builderType = GenericsUtils.getGenericTypeOf(builderDelegate.getClass());
-
-        if (builderType == null) {
-            throw new IllegalStateException(String.format(
-                    "Could not find type of Builder from delegate: [%s].", builderDelegate.getClass()));
-        }
 
         for (Object element : collectionWithBuilders) {
-            if (builderType.isAssignableFrom(element.getClass())) {
+            if (builderDelegate.isBuilderInstance(element)) {
                 element = builderDelegate.build(element);
             }
             transformed.add(element);

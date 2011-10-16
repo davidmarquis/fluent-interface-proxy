@@ -10,10 +10,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 
+import static com.fluentinterface.ReflectionBuilder.implementationFor;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.collection.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.isNotNull;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BuilderProxyTest {
@@ -26,7 +26,7 @@ public class BuilderProxyTest {
     }
 
     private PersonBuilder aPerson() {
-        return ReflectionBuilder.implementationFor(PersonBuilder.class).create();
+        return implementationFor(PersonBuilder.class).create();
     }
 
     @Test

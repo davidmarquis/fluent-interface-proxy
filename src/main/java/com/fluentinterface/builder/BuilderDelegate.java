@@ -1,7 +1,7 @@
 package com.fluentinterface.builder;
 
 /**
- * This interface allows users of this API to use their own "builders" instead of using the provided super interface.
+ * This interface allows to use a different strategy for delegating builders.
  *
  * @param <B> Type for builders the delegate handles.
  * @see Builder
@@ -14,4 +14,12 @@ public interface BuilderDelegate<B> {
      * @return the built object.
      */
     public Object build(B builder);
+
+    /**
+     * @param value when a builder set values on the target object, it will ask the builder delegate to determine if
+     * the value is a 'builder'. If it is, then it will be asked to be built and the result will be set on the target object
+     * (the object being created by the dynamic builder).
+     * @return whether the provided object is a Builder or not.
+     */
+    public boolean isBuilderInstance(Object value);
 }

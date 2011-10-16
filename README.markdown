@@ -59,7 +59,7 @@ Yay! No code!
 
 ## The problem
 
-Writing (Fluent Interfaces)[http://en.wikipedia.org/wiki/Fluent_interface] for creating beans in Java is cumbersome.
+Writing [Fluent Interfaces](http://en.wikipedia.org/wiki/Fluent_interface) for creating beans in Java is cumbersome.
 It requires the programmer to write a lot of boilerplate code to implement a builder for simple javabeans. This project
 aims at facilitating the implementation of such patterns by providing an automatic implementation of builder interfaces.
 

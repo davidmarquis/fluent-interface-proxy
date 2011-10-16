@@ -2,56 +2,56 @@
 
 Given a Javabean:
 
-    ```java
-    public class Person {
-        private String name;
-        private int age;
-        private List<Person> friends;
+```java
+public class Person {
+    private String name;
+    private int age;
+    private List<Person> friends;
 
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public void setAge(int age) {
-            this.age = age;
-        }
-
-        public void setFriends(List<Friend> friends) {
-            this.friends = friends;
-        }
-
-        ... getters omitted for brevity ...
+    public void setName(String name) {
+        this.name = name;
     }
-    ```
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public void setFriends(List<Friend> friends) {
+        this.friends = friends;
+    }
+
+    ... getters omitted for brevity ...
+}
+```
 
 And a builder:
 
-    ```java
-    public interface PersonBuilder extends Builder<Person> {
-        PersonBuilder withName(String name);
-        PersonBuilder withAge(int age);
-        PersonBuilder withFriends(PersonBuilder... friends);
-    }
-    ```
+```java
+public interface PersonBuilder extends Builder<Person> {
+    PersonBuilder withName(String name);
+    PersonBuilder withAge(int age);
+    PersonBuilder withFriends(PersonBuilder... friends);
+}
+```
 
 Enjoy an automatic implementation of your builder:
 
-    ```java
-    public static PersonBuilder aPerson() {
-        return ReflectionBuilder.implementationFor(PersonBuilder.class).create();
-    }
+```java
+public static PersonBuilder aPerson() {
+    return ReflectionBuilder.implementationFor(PersonBuilder.class).create();
+}
 
-    ...
+...
 
-    Person person = aPerson()
-                        .withName("John Doe")
-                        .withAge(44)
-                        .withFriends(
-                            aPerson().withName("Smitty Smith"),
-                            aPerson().withName("Joe Anderson")
-                        )
-                        .build();
-    ```
+Person person = aPerson()
+                    .withName("John Doe")
+                    .withAge(44)
+                    .withFriends(
+                        aPerson().withName("Smitty Smith"),
+                        aPerson().withName("Joe Anderson")
+                    )
+                    .build();
+```
 
 Yay! No code!
 

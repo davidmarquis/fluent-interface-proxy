@@ -11,6 +11,10 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * A dynamic proxy which will build a bean of the target type upon calls to the implemented interface.
+ * The interface implemented by this proxy must have.
+ */
 public class BuilderProxy implements InvocationHandler {
 
     private static final Pattern BUILDER_METHOD_PROPERTY_PATTERN = Pattern.compile("[a-z]+([A-Z].*)");
@@ -20,7 +24,7 @@ public class BuilderProxy implements InvocationHandler {
     private BuilderDelegate builderDelegate;
     private Map<String, Object> propertiesToSet;
 
-    BuilderProxy(Class builderInterface, Class builtClass, BuilderDelegate builderDelegate) {
+    public BuilderProxy(Class builderInterface, Class builtClass, BuilderDelegate builderDelegate) {
         this.proxied = builderInterface;
         this.builtClass = builtClass;
         this.builderDelegate = builderDelegate;
@@ -137,6 +141,7 @@ public class BuilderProxy implements InvocationHandler {
         return (builderDelegate != null);
     }
 
+    @SuppressWarnings("unchecked")
     private Object buildIfBuilderInstance(Object value) {
         if (!hasBuilderDelegate()) {
             return value;
@@ -149,6 +154,7 @@ public class BuilderProxy implements InvocationHandler {
         return value;
     }
 
+    @SuppressWarnings("unchecked")
     private Collection<Object> convertToCollectionIfMultiValued(Object value) {
         Class valueClass = value.getClass();
         Collection<Object> valueAsCollection = null;
@@ -183,6 +189,7 @@ public class BuilderProxy implements InvocationHandler {
         return Collection.class.isAssignableFrom(clazz);
     }
 
+    @SuppressWarnings("unchecked")
     private Collection<Object> createCollectionOfType(Class clazz) throws IllegalAccessException, InstantiationException {
         if (!isCollection(clazz)) {
             throw new IllegalArgumentException(String.format("Class [%s] is not a collection.", clazz));
@@ -219,6 +226,9 @@ public class BuilderProxy implements InvocationHandler {
     }
 
     private boolean isBuild(Method method) {
+        if (hasBuilderDelegate()) {
+            return builderDelegate.isBuildMethod(method);
+        }
         return method.getReturnType() == Object.class;
     }
 

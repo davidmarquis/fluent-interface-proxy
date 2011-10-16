@@ -6,6 +6,7 @@ import com.fluentinterface.proxy.BuilderProxy;
 import com.fluentinterface.utils.GenericsUtils;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 public class ReflectionBuilder<T> {
@@ -16,6 +17,7 @@ public class ReflectionBuilder<T> {
     private Class<T> builderInterface;
     private Class<?> builtClass;
 
+    @SuppressWarnings("unchecked")
     private ReflectionBuilder(Class<T> builderInterface) {
         if (!builderInterface.isInterface()) {
             throw new IllegalArgumentException(String.format(
@@ -45,6 +47,7 @@ public class ReflectionBuilder<T> {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     public T create() {
         if (builtClass == null) {
             throw new IllegalStateException(String.format(
@@ -68,12 +71,30 @@ public class ReflectionBuilder<T> {
 
     private static class InternalBuilderAsSuperClassDelegate implements BuilderDelegate<Builder> {
 
+        private static final String BUILD_METHOD_NAME = "build";
+        private Method buildMethod;
+
+        public InternalBuilderAsSuperClassDelegate() {
+            try {
+                this.buildMethod = Builder.class.getMethod(BUILD_METHOD_NAME);
+            } catch (NoSuchMethodException e) {
+                throw new IllegalStateException(
+                        String.format("Could not find [%s] method on [%s] class.", BUILD_METHOD_NAME, Builder.class),
+                        e
+                );
+            }
+        }
+
         public Object build(Builder builder) {
             return builder.build();
         }
 
         public boolean isBuilderInstance(Object value) {
             return value instanceof Builder;
+        }
+
+        public boolean isBuildMethod(Method method) {
+            return method.equals(buildMethod);
         }
     }
 }

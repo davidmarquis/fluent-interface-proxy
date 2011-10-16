@@ -171,6 +171,15 @@ public class BuilderProxyTest {
         assertThat(built.getPartner().getName(), is("Diane"));
     }
 
+    @Test
+    public void souldCopyCollectionDirectlyWhenNotSupported() {
+
+        ArrayDeque queue = new ArrayDeque();
+        Person built = personBuilder.withQueue(queue).build();
+
+        assert built.getQueue() == queue;
+    }
+
     @Test(expected = IllegalStateException.class)
     public void shouldFailWhenBuilderUsesAnUnknownProperty() {
 
@@ -187,11 +196,5 @@ public class BuilderProxyTest {
     public void shouldFailWhenBuilderMethodDoesNotContainPropertyName() {
 
         personBuilder.something("fails").build();
-    }
-
-    @Test
-    public void shouldFailForUnsupportedCollectionTypes() {
-
-        personBuilder.withQueue(new ArrayDeque()).build();
     }
 }

@@ -19,7 +19,7 @@ public class FluentInterfaceProxy implements InvocationHandler {
     private FluentInterfaceProxy(Class<?> proxied) throws InstantiationException, IllegalAccessException {
         this.proxied = proxied;
         this.builtClass = extractBuiltClass(proxied);
-        this.propertiesToSet = new HashMap<String, Object>();
+        this.propertiesToSet = new LinkedHashMap<String, Object>();
     }
 
     public static <T extends Builder<?>> T implementBuilder(Class<T> builderInterface) throws IllegalAccessException, InstantiationException {

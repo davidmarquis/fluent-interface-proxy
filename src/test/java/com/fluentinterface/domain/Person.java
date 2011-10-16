@@ -1,0 +1,77 @@
+package com.fluentinterface.domain;
+
+import java.util.List;
+import java.util.Queue;
+import java.util.Set;
+
+public class Person {
+    private String name;
+    private int age;
+    private List<Person> friends;
+    private Set<String> surnames;
+
+    private Person[] parents;
+
+    private int[] agesOfMarriages;
+
+    /**
+     * Note: Queues are not supported by the proxy builder.
+     */
+    private Queue queue;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public List<Person> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(List<Person> friends) {
+        this.friends = friends;
+    }
+
+    public Set<String> getSurnames() {
+        return surnames;
+    }
+
+    public void setSurnames(Set<String> surnames) {
+        this.surnames = surnames;
+    }
+
+    public Person[] getParents() {
+        return parents;
+    }
+
+    public void setParents(Person[] parents) {
+        this.parents = parents;
+    }
+
+    public int[] getAgesOfMarriages() {
+        return agesOfMarriages;
+    }
+
+    public void setAgesOfMarriages(int[] agesOfMarriages) {
+        this.agesOfMarriages = agesOfMarriages;
+    }
+
+    public Queue getQueue() {
+        return queue;
+    }
+
+    public void setQueue(Queue queue) {
+        this.queue = queue;
+    }
+}

@@ -1,6 +1,5 @@
-package com.fluentinterface;
+package com.fluentinterface.proxy;
 
-import com.fluentinterface.builder.BuilderDelegate;
 import org.apache.commons.beanutils.PropertyUtils;
 
 import java.beans.PropertyDescriptor;

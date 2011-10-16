@@ -1,10 +1,10 @@
-package com.fluentinterface.builder;
+package com.fluentinterface.proxy;
 
 /**
  * This interface allows to use a different strategy for delegating builders.
  *
  * @param <B> Type for builders the delegate handles.
- * @see Builder
+ * @see com.fluentinterface.builder.Builder
  */
 public interface BuilderDelegate<B> {
     /**

@@ -1,7 +1,8 @@
 package com.fluentinterface;
 
 import com.fluentinterface.builder.Builder;
-import com.fluentinterface.builder.BuilderDelegate;
+import com.fluentinterface.proxy.BuilderDelegate;
+import com.fluentinterface.proxy.BuilderProxy;
 import com.fluentinterface.utils.GenericsUtils;
 
 import java.lang.reflect.InvocationHandler;

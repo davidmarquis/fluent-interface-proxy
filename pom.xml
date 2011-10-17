@@ -4,17 +4,48 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!--<parent>-->
+        <!--<groupId>org.sonatype.oss</groupId>-->
+        <!--<artifactId>oss-parent</artifactId>-->
+        <!--<version>7</version>-->
+    <!--</parent>-->
+
     <groupId>com.github</groupId>
     <artifactId>fluent-interface-proxy</artifactId>
-    <version>1.0</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
+
+    <name>fluent-interface-proxy</name>
+    <description>A dynamic proxy that implements builders transparently.</description>
+    <url>https://github.com/davidmarquis/fluent-interface-proxy</url>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:davidmarquis/fluent-interface-proxy.git</connection>
+        <developerConnection>scm:git:git@github.com:davidmarquis/fluent-interface-proxy.git</developerConnection>
+        <url>git@github.com:davidmarquis/fluent-interface-proxy.git</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>dmarquis</id>
+            <name>David Marquis</name>
+            <email>davidmarquis@me.com</email>
+        </developer>
+    </developers>
 
     <dependencies>
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
-            <version>1.8.3</version>
-            <scope>provided</scope>
+            <version>[1.7.0,)</version>
         </dependency>
 
         <dependency>

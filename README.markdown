@@ -91,10 +91,10 @@ All you need to make sure is that you follow a few conventions when designing yo
  * **Every property-setting method has to return the builder itself**.
  We're using the Builder pattern, eh?
  * **For multi-valued properties (arrays or collections), you can use varargs in your interface.**
- The framework will automatically convert to set the correct value on the target bean.
+ The framework will automatically convert to set the correct value on the target bean (even collections!).
  * **You may use a `Builder` in place of any bean in your builder.**
  The Builder's build() method will automatically be called and the resulting bean will be set on the target bean's property.
- * **By default, your builder interface should extend the `Builder` interface provided in the framework.**
+ * **By default, your builder interface should extend the `Builder<T>` interface provided in the framework.**
  This interface has a single method: `T build()`. If extending this interface is too invasive (I understand why it would be in some cases),
  you can use your own super interface, but you have to provide custom code to 'plug it in' (an explanation will be added soon).
 

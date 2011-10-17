@@ -81,7 +81,7 @@ All you need to make sure is that you follow a few conventions when designing yo
  * Supports varargs arguments in builders that can be directly copied to an array property on the target bean, or transformed as any Collection.
  * Whenever a Builder is encountered in your Builder interface's methods, this builder will be asked to build the object prior to setting the target bean's property value.
 
-## Designing your builder interfaces
+## Tips for designing your builder interfaces
 
  * **Any prefix is supported for property-setting methods**
  In the example above, `with` is used for all methods, but anything could be used.

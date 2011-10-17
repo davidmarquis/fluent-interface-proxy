@@ -110,16 +110,8 @@ public class BuilderProxy implements InvocationHandler {
         return originalValue;
     }
 
-    private Object collectionToArray(Collection<Object> valueAsCollection, Class targetPropertyType) {
-        Class arrayElementsType = targetPropertyType.getComponentType();
-        int arraySize = valueAsCollection.size();
-
-        Object createdArray = Array.newInstance(arrayElementsType, arraySize);
-        int idx = 0;
-        for (Object arrayElement : valueAsCollection) {
-            Array.set(createdArray, idx++, arrayElement);
-        }
-        return createdArray;
+    private boolean hasBuilderDelegate() {
+        return (builderDelegate != null);
     }
 
     private Collection<Object> buildBuildersInCollection(Collection<Object> collectionWithBuilders) {
@@ -135,10 +127,6 @@ public class BuilderProxy implements InvocationHandler {
         }
 
         return transformed;
-    }
-
-    private boolean hasBuilderDelegate() {
-        return (builderDelegate != null);
     }
 
     @SuppressWarnings("unchecked")
@@ -168,6 +156,18 @@ public class BuilderProxy implements InvocationHandler {
         }
 
         return valueAsCollection;
+    }
+
+    private Object collectionToArray(Collection<Object> valueAsCollection, Class targetPropertyType) {
+        Class arrayElementsType = targetPropertyType.getComponentType();
+        int arraySize = valueAsCollection.size();
+
+        Object createdArray = Array.newInstance(arrayElementsType, arraySize);
+        int idx = 0;
+        for (Object arrayElement : valueAsCollection) {
+            Array.set(createdArray, idx++, arrayElement);
+        }
+        return createdArray;
     }
 
     private Collection<Object> arrayToCollection(Object array) {

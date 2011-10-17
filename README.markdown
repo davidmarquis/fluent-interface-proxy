@@ -84,28 +84,42 @@ All you need to make sure is that you follow a few conventions when designing yo
 ## Tips for designing your builder interfaces
 
  * **Any prefix is supported for property-setting methods**
- In the example above, `with` is used for all methods, but anything could be used.
+    In the example above, `with` is used for all methods, but anything could be used.
  * **The property names must match between the builder method and the actual bean property**
- For every property-setting method in your builder, there must exist a property that is named exactly the same as what comes after the lower case prefix.
- Ex: `builder.withSomething` -> `bean.setSomething`
+    For every property-setting method in your builder, there must exist a property that is named exactly the same as what comes after the lower case prefix.
+    Ex: `builder.withSomething` -> `bean.setSomething`
  * **Every property-setting method has to return the builder itself**.
- We're using the Builder pattern, eh?
+    We're using the Builder pattern, eh?
  * **For multi-valued properties (arrays or collections), you can use varargs in your interface.**
- The framework will automatically convert to set the correct value on the target bean (even collections!).
+    The framework will automatically convert to set the correct value on the target bean (even collections!).
  * **You may use a `Builder` in place of any bean in your builder.**
- The Builder's build() method will automatically be called and the resulting bean will be set on the target bean's property.
+    The Builder's build() method will automatically be called and the resulting bean will be set on the target bean's property.
  * **By default, your builder interface should extend the `Builder<T>` interface provided in the framework.**
- This interface has a single method: `T build()`. If extending this interface is too invasive (I understand why it would be in some cases),
- you can use your own super interface, but you have to provide custom code to 'plug it in' (an explanation will be added soon).
+    This interface has a single method: `T build()`. If extending this interface is too invasive (I understand why it would be in some cases),
+    you can use your own super interface, but you have to provide custom code to 'plug it in' (an explanation will be added soon).
 
 ## Other documentation
 
 Have a look at the tests defined in the `test` folder to see some sample usages of the dynamic builder.
 
-## Maven dependency
+## Using the code
 
-This project is not currently published on the Maven Central repository, so you have to checkout the project locally, build and install the
-artifact in your own repository. I do plan to publish the artifact on Maven Central as soon as possible however.
+### Using binaries directly
 
+A packaged JAR of the latest build is available directly at the root of the project.
 
+### Using Maven
+
+This project is not currently published on the Maven Central repository, so you have to checkout the project locally,
+then build and install the artifact in your own repository. I do plan to publish the artifact on Maven Central as soon
+as possible however. Stay tuned!
+
+## Future features
+
+Here are some features I'd like to eventually add to the project:
+
+ * Support for conversions: `aPerson().withAge("45").build()`
+    Allows for use cases where inputs as strings are used directly (I am mostly thinking of functional testing frameworks
+    like Fitnesse (fixtures) or Cucumber)
+ * Support for specifying custom handlers for builder methods. Could allow: `aPerson().named("Joe").aged(45).build()`
 

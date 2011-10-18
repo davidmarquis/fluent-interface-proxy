@@ -66,6 +66,17 @@ public class BuilderProxyTest {
     }
 
     @Test
+    public void shouldSetPropertyValueToLastOneWhenCalledMultipleTimes() {
+
+        Person built = personBuilder
+                .withAge(10)
+                .withAge(20)
+                .build();
+
+        assertThat(built.getAge(), is(20));
+    }
+
+    @Test
     public void shouldSetPropertyValueArrayToList() {
 
 

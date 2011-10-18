@@ -148,9 +148,7 @@ public class BuilderProxy implements InvocationHandler {
 
         if (valueClass.isArray()) {
             valueAsCollection = arrayToCollection(value);
-        }
-
-        if (isCollection(valueClass)) {
+        } else if (isCollection(valueClass)) {
             valueAsCollection = (Collection) value;
         }
 
@@ -166,6 +164,7 @@ public class BuilderProxy implements InvocationHandler {
         for (Object arrayElement : valueAsCollection) {
             Array.set(createdArray, idx++, arrayElement);
         }
+
         return createdArray;
     }
 

@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 
 /**
  * A dynamic proxy which will build a bean of the target type upon calls to the implemented interface.
- * The interface implemented by this proxy must have.
  */
 public class BuilderProxy implements InvocationHandler {
 

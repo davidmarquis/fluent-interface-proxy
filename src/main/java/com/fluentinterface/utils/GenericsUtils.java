@@ -4,8 +4,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 public class GenericsUtils {
-    private GenericsUtils() {
-    }
+
+    private GenericsUtils() {}
 
     public static Class<?> getGenericTypeOf(Class<?> clazz) {
         Type[] genericInterfaces = clazz.getGenericInterfaces();

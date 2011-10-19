@@ -106,7 +106,8 @@ Have a look at the tests defined in the `test` folder to see some sample usages 
 
 ### Using binaries directly
 
-A packaged JAR of the latest build is available directly at the root of the project.
+A packaged JAR of the latest build is available in the [Downloads](https://github.com/davidmarquis/fluent-interface-proxy/downloads)
+section of the project's Github section.
 
 ### Using Maven
 

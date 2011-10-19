@@ -123,6 +123,7 @@ Here are some features I'd like to eventually add to the project:
     like Fitnesse (fixtures) or Cucumber)
  * Support for specifying custom handlers for builder methods. Could allow: `aPerson().named("Joe").aged(45).build()`
  * Configuration of the non-standard builder methods through annotations. Something like:
+
 ```java
 public interface PersonBuilder extends Builder<Person> {
     @Sets(property = "name")

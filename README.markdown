@@ -36,7 +36,7 @@ public interface PersonBuilder extends Builder<Person> {
     PersonBuilder withName(String name);
     PersonBuilder withAge(int age);
     PersonBuilder withPartner(PersonBuilder partner);
-    PersonBuilder withFriends(PersonBuilder... friends);
+    PersonBuilder havingFriends(PersonBuilder... friends);
 }
 ```
 
@@ -53,7 +53,7 @@ Person person = aPerson()
                     .withName("John Doe")
                     .withAge(44)
                     .withPartner( aPerson().withName("Diane Doe") )
-                    .withFriends(
+                    .havingFriends(
                         aPerson().withName("Smitty Smith"),
                         aPerson().withName("Joe Anderson")
                     )
@@ -84,7 +84,7 @@ All you need to make sure is that you follow a few conventions when designing yo
 ## Tips for designing your builder interfaces
 
  * **Any prefix is supported for property-setting methods**
-    In the example above, `with` is used for all methods, but anything could be used.
+    In the example above, `with` and `having` are used, but anything else lower case could be used.
  * **The property names must match between the builder method and the actual bean property**
     For every property-setting method in your builder, there must exist a property that is named exactly the same as what comes after the lower case prefix.
     Ex: `builder.withSomething` -> `bean.setSomething`

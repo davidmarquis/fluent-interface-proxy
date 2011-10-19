@@ -114,7 +114,7 @@ This project is not currently published on the Maven Central repository, so you 
 then build and install the artifact in your own repository. I do plan to publish the artifact on Maven Central as soon
 as possible however. Stay tuned!
 
-## Future features
+## Future features (wishlist)
 
 Here are some features I'd like to eventually add to the project:
 
@@ -122,4 +122,14 @@ Here are some features I'd like to eventually add to the project:
     Allows for use cases where inputs as strings are used directly (I am mostly thinking of functional testing frameworks
     like Fitnesse (fixtures) or Cucumber)
  * Support for specifying custom handlers for builder methods. Could allow: `aPerson().named("Joe").aged(45).build()`
+ * Configuration of the non-standard builder methods through annotations. Something like:
+```java
+public interface PersonBuilder extends Builder<Person> {
+    @Sets(property = "name")
+    PersonBuilder named(String name);
+    @Sets(property = "age", convertTo = int.class)
+    PersonBuilder aged(String age);
+    ...
+}
+```
 

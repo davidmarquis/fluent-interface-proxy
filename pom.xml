@@ -4,19 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!--<parent>-->
-        <!--<groupId>org.sonatype.oss</groupId>-->
-        <!--<artifactId>oss-parent</artifactId>-->
-        <!--<version>7</version>-->
-    <!--</parent>-->
-
     <groupId>com.github</groupId>
     <artifactId>fluent-interface-proxy</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <name>fluent-interface-proxy</name>
-    <description>A dynamic proxy that implements builders transparently.</description>
+    <description>A dynamic proxy that implements builder interfaces transparently.</description>
     <url>https://github.com/davidmarquis/fluent-interface-proxy</url>
 
     <licenses>

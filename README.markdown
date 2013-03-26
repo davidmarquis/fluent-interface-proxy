@@ -145,8 +145,7 @@ Have a look at the tests defined in the `test` folder to see some sample usages 
 
 ### Using binaries directly
 
-A packaged JAR of the latest build is available in the [Downloads](https://github.com/davidmarquis/fluent-interface-proxy/downloads)
-section of the project's Github section.
+A packaged JAR of the builds is available in the [releases folder](https://github.com/davidmarquis/fluent-interface-proxy/tree/master/releases).
 
 ### Using Maven
 

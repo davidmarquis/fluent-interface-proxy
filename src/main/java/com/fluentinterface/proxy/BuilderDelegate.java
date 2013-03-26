@@ -28,7 +28,7 @@ public interface BuilderDelegate<B> {
     Object build(B builder);
 
     /**
-     * @param value when a builder set values on the target object, it will ask the builder delegate to determine if
+     * @param value when a builder sets values on the target object, it will ask the builder delegate to determine if
      * the value is a 'builder'. If it is, then it will be asked to be built and the result will be set on the target object
      * (the object being created by the dynamic builder).
      * @return whether the provided object is a Builder or not.
@@ -37,7 +37,7 @@ public interface BuilderDelegate<B> {
 
     /**
      * Implementation has to determine if the provided Method is the actual 'build' method. That is, the method that
-     * builds the final object being built.
+     * builds the final object.
      * @param method a method that is being called.
      * @return whether the provided method is the 'build' method or not.
      */

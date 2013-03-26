@@ -32,7 +32,7 @@ public class BuilderProxy implements InvocationHandler {
 
     public Object invoke(Object target, Method method, Object[] params) throws Throwable {
 
-        if (isSetter(method)) {
+        if (isFluentSetter(method)) {
             String propertyBeingSet = extractPropertyNameFrom(method);
             Object valueForProperty = params[0];
 
@@ -224,7 +224,7 @@ public class BuilderProxy implements InvocationHandler {
         return method.getReturnType() == Object.class;
     }
 
-    private boolean isSetter(Method method) {
+    private boolean isFluentSetter(Method method) {
         return method.getParameterTypes().length == 1
                 && method.getReturnType() == proxied;
     }
@@ -236,9 +236,6 @@ public class BuilderProxy implements InvocationHandler {
         if (source.length() == 1) {
             return source.toLowerCase();
         }
-        return new StringBuilder()
-                .append(source.substring(0, 1).toLowerCase())
-                .append(source.substring(1))
-                .toString();
+        return source.substring(0, 1).toLowerCase() + source.substring(1);
     }
 }

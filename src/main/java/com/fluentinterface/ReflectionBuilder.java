@@ -57,7 +57,7 @@ public class ReflectionBuilder<T> {
         return this;
     }
 
-    public ReflectionBuilder<T> usingFields() {
+    public ReflectionBuilder<T> usingFieldsDirectly() {
         this.attributeAccessStrategy = new FieldAttributeAccessStrategy();
         return this;
     }

@@ -4,6 +4,9 @@ import com.fluentinterface.proxy.AttributeAccessStrategy;
 
 import java.lang.reflect.Field;
 
+/**
+ * Strategy that sets the target bean's attributes directly using the Reflection API (without going through the setters).
+ */
 public class FieldAttributeAccessStrategy implements AttributeAccessStrategy {
 
     public boolean hasProperty(Class<?> builtClass, String property) {

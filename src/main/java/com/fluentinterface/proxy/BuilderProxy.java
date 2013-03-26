@@ -1,11 +1,7 @@
 package com.fluentinterface.proxy;
 
-import org.apache.commons.beanutils.PropertyUtils;
-
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -21,12 +17,16 @@ public class BuilderProxy implements InvocationHandler {
     private Class proxied;
     private Class  builtClass;
     private BuilderDelegate builderDelegate;
+    private AttributeAccessStrategy attributeAccessStrategy;
     private Map<String, Object> propertiesToSet;
 
-    public BuilderProxy(Class builderInterface, Class builtClass, BuilderDelegate builderDelegate) {
+    public BuilderProxy(Class builderInterface, Class builtClass, BuilderDelegate builderDelegate,
+                        AttributeAccessStrategy attributeAccessStrategy) {
+
         this.proxied = builderInterface;
         this.builtClass = builtClass;
         this.builderDelegate = builderDelegate;
+        this.attributeAccessStrategy = attributeAccessStrategy;
         this.propertiesToSet = new LinkedHashMap<String, Object>();
     }
 
@@ -54,16 +54,10 @@ public class BuilderProxy implements InvocationHandler {
     }
 
     private boolean hasProperty(Class<?> builtClass, String propertyName) {
-        PropertyDescriptor[] propertyDescriptors = PropertyUtils.getPropertyDescriptors(builtClass);
-        for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
-            if (propertyDescriptor.getName().equals(propertyName)) {
-                return true;
-            }
-        }
-        return false;
+        return attributeAccessStrategy.hasProperty(builtClass, propertyName);
     }
 
-    private Object createInstanceFromProperties() throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+    private Object createInstanceFromProperties() throws Exception {
         Object instance = builtClass.newInstance();
 
         for (Map.Entry<String, Object> entry : propertiesToSet.entrySet()) {
@@ -76,8 +70,8 @@ public class BuilderProxy implements InvocationHandler {
         return instance;
     }
 
-    private void setTargetProperty(Object target, String property, Object value) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        Class targetPropertyType = PropertyUtils.getPropertyType(target, property);
+    private void setTargetProperty(Object target, String property, Object value) throws Exception {
+        Class targetPropertyType = attributeAccessStrategy.getPropertyType(target, property);
 
         if (value != null) {
             Collection<Object> valueAsCollection = convertToCollectionIfMultiValued(value);
@@ -90,7 +84,7 @@ public class BuilderProxy implements InvocationHandler {
             }
         }
 
-        PropertyUtils.setProperty(target, property, value);
+        attributeAccessStrategy.setPropertyValue(target, property, value);
     }
 
     private Object transformCollectionToTargetTypeIfPossible(Object originalValue, Collection<Object> valueAsCollection,

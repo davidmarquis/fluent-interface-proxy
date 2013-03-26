@@ -1,8 +1,11 @@
 package com.fluentinterface;
 
 import com.fluentinterface.builder.Builder;
+import com.fluentinterface.proxy.AttributeAccessStrategy;
 import com.fluentinterface.proxy.BuilderDelegate;
 import com.fluentinterface.proxy.BuilderProxy;
+import com.fluentinterface.proxy.impl.FieldAttributeAccessStrategy;
+import com.fluentinterface.proxy.impl.SetterAttributeAccessStrategy;
 import com.fluentinterface.utils.GenericsUtils;
 
 import java.lang.reflect.InvocationHandler;
@@ -16,6 +19,7 @@ public class ReflectionBuilder<T> {
     private BuilderDelegate<? super T> builderDelegate;
     private Class<T> builderInterface;
     private Class<?> builtClass;
+    private AttributeAccessStrategy attributeAccessStrategy;
 
     @SuppressWarnings("unchecked")
     private ReflectionBuilder(Class<T> builderInterface) {
@@ -27,6 +31,7 @@ public class ReflectionBuilder<T> {
         this.builderInterface = builderInterface;
         this.builtClass = implyBuiltClassFromImplementedInterface(builderInterface);
         this.builderDelegate = defaultBuilderDelegate;
+        this.attributeAccessStrategy = new SetterAttributeAccessStrategy();
     }
 
     public static void setDefaultBuilderDelegate(BuilderDelegate delegate) {
@@ -47,17 +52,27 @@ public class ReflectionBuilder<T> {
         return this;
     }
 
+    public ReflectionBuilder<T> usingAttributeAccessStrategy(AttributeAccessStrategy strategy) {
+        this.attributeAccessStrategy = strategy;
+        return this;
+    }
+
+    public ReflectionBuilder<T> usingFields() {
+        this.attributeAccessStrategy = new FieldAttributeAccessStrategy();
+        return this;
+    }
+
     @SuppressWarnings("unchecked")
     public T create() {
         if (builtClass == null) {
             throw new IllegalStateException(String.format(
                     "Could not imply class being built by builder [%s]. " +
-                            "If the interface does not extend [%s], you must explicitely set the type of object being built using the 'with(class)' method.",
+                            "If the interface does not extend [%s], you must explicitly set the type of object being built using the 'builds(class)' method.",
                     builderInterface, Builder.class
             ));
         }
 
-        InvocationHandler handler = new BuilderProxy(builderInterface, builtClass, builderDelegate);
+        InvocationHandler handler = new BuilderProxy(builderInterface, builtClass, builderDelegate, attributeAccessStrategy);
 
         return (T) Proxy.newProxyInstance(
                 builderInterface.getClassLoader(),

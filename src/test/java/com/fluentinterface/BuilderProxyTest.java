@@ -2,24 +2,41 @@ package com.fluentinterface;
 
 import com.fluentinterface.domain.Person;
 import com.fluentinterface.domain.PersonBuilder;
+import com.fluentinterface.proxy.AttributeAccessStrategy;
+import com.fluentinterface.proxy.impl.FieldAttributeAccessStrategy;
+import com.fluentinterface.proxy.impl.SetterAttributeAccessStrategy;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.junit.runners.Parameterized;
 
 import java.util.ArrayDeque;
-import java.util.Arrays;
 
 import static com.fluentinterface.ReflectionBuilder.implementationFor;
+import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.collection.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(Parameterized.class)
 public class BuilderProxyTest {
 
+    @Parameterized.Parameters
+    public static Iterable<Object[]> strategies() {
+        return asList(
+                new Object[] {new FieldAttributeAccessStrategy()},
+                new Object[] {new SetterAttributeAccessStrategy()}
+        );
+    }
+
     private PersonBuilder personBuilder;
+
+    private AttributeAccessStrategy attributeAccessStrategy;
+
+    public BuilderProxyTest(AttributeAccessStrategy attributeAccessStrategy) {
+        this.attributeAccessStrategy = attributeAccessStrategy;
+    }
 
     @Before
     public void setup() throws InstantiationException, IllegalAccessException {
@@ -27,7 +44,9 @@ public class BuilderProxyTest {
     }
 
     private PersonBuilder aPerson() {
-        return implementationFor(PersonBuilder.class).create();
+        return implementationFor(PersonBuilder.class)
+                .usingAttributeAccessStrategy(attributeAccessStrategy)
+                .create();
     }
 
     @Test
@@ -122,7 +141,7 @@ public class BuilderProxyTest {
     @Test
     public void shouldSetPropertyValueCollectionOfBuildersToCollection() {
         Person built = personBuilder
-                .withFriends(Arrays.asList(
+                .withFriends(asList(
                         aPerson().withName("Joe"),
                         aPerson().withName("Blow")
                 ))
@@ -137,7 +156,7 @@ public class BuilderProxyTest {
     public void shouldSetPropertyValueCollectionToCollection() {
 
         Person built = personBuilder
-                .withParents(Arrays.asList(
+                .withParents(asList(
                         aPerson().withName("Mommy").build(),
                         aPerson().withName("Daddy").build()))
                 .build();

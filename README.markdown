@@ -79,6 +79,7 @@ All you need to make sure is that you follow a few conventions when designing yo
 
  * Supports any type of property by simply copying the value passed in the builder to the bean's property.
  * Supports varargs arguments in builders that can be directly copied to an array property on the target bean, or transformed as any Collection.
+ * Supports setting bean values using both public setters and using private fields directly.
  * Whenever a Builder is encountered in your Builder interface's methods, this builder will be asked to build the object prior to setting the target bean's property value.
 
 ## Tips for designing your builder interfaces
@@ -96,7 +97,45 @@ All you need to make sure is that you follow a few conventions when designing yo
     The Builder's build() method will automatically be called and the resulting bean will be set on the target bean's property.
  * **By default, your builder interface should extend the `Builder<T>` interface provided in the framework.**
     This interface has a single method: `T build()`. If extending this interface is too invasive (I understand why it would be in some cases),
-    you can use your own super interface, but you have to provide custom code to 'plug it in' (an explanation will be added soon).
+    you can use your own super interface, but you have to provide custom code to 'plug it in' (see below).
+
+## Using your own `build` method
+
+By default, `ReflectionBuilder` assumes that your builder interfaces extend the `Builder` interface provided by the library.
+
+If you want to use your own builder interface (and thus your own `build()` methods), you need to tell the `ReflectionBuilder` when creating the
+dynamic builder:
+
+``` java
+ReflectionBuilder.implementationFor(YourBean.class)
+        .withDelegate(new YourBuilderDelegate())
+        .create();
+```
+
+Have a look at the `BuilderDelegate` interface, as well as the default implementation of this interface in `ReflectionBuilder` for more
+details on what to provide in your implementation.
+
+
+## Choosing between setters or private fields
+
+The library supports both setting the target bean's attributes using public setters or private fields (using the Reflection API).
+By default, public setters are used. You may choose to use fields directly using this:
+
+``` java
+ReflectionBuilder.implementationFor(YourBean.class)
+        .usingFieldsDirectly()
+        .create();
+```
+
+You may also provide your own implementation of the `AttributeAccessStrategy` interface and use it this way:
+
+``` java
+AttributeAccessStrategy yourStrategy = new YourStrategy();  // implements AttributeAccessStrategy interface
+
+ReflectionBuilder.implementationFor(YourBean.class)
+        .usingAttributeAccessStrategy(yourStrategy)
+        .create();
+```
 
 ## Other documentation
 

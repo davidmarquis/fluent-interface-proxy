@@ -6,7 +6,7 @@
 
     <groupId>com.github</groupId>
     <artifactId>fluent-interface-proxy</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.2.0</version>
     <packaging>jar</packaging>
 
     <name>fluent-interface-proxy</name>

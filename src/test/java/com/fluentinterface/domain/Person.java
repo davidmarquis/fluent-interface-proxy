@@ -14,6 +14,25 @@ public class Person {
     private int[] agesOfMarriages;
     private Queue queue;
 
+    public Person() {
+    }
+
+    public Person(String name, int age, Person partner) {
+        this.name = name;
+        this.age = age;
+        this.partner = partner;
+    }
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public Person(Person partner, int age) {
+        this.partner = partner;
+        this.age = age;
+    }
+
     public String getName() {
         return name;
     }

@@ -1,6 +1,7 @@
 package com.fluentinterface.proxy;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -46,19 +47,32 @@ public class BuilderProxy implements InvocationHandler {
             propertiesToSet.put(propertyBeingSet, valueForProperty);
 
             return target;
-        } else if (isBuild(method)) {
-            return createInstanceFromProperties();
+        } else if (isBuildMethod(method)) {
+            params = extractVarArgsIfNeeded(params);
+            return createInstanceFromProperties(params);
         }
 
         throw new IllegalStateException("Unrecognized builder method: " + method);
+    }
+
+    private Object[] extractVarArgsIfNeeded(Object[] params) {
+        if (params != null
+                && params.length == 1
+                && params[params.length - 1].getClass().isArray()) {
+            return (Object[]) params[params.length - 1];
+        }
+        return params;
     }
 
     private boolean hasProperty(Class<?> builtClass, String propertyName) {
         return attributeAccessStrategy.hasProperty(builtClass, propertyName);
     }
 
-    private Object createInstanceFromProperties() throws Exception {
-        Object instance = builtClass.newInstance();
+    private Object createInstanceFromProperties(Object[] params) throws Exception {
+        buildIfBuilderInstances(params);
+
+        Constructor<?> constructor = findMatchingConstructor(params);
+        Object instance = constructor.newInstance(params);
 
         for (Map.Entry<String, Object> entry : propertiesToSet.entrySet()) {
             String property = entry.getKey();
@@ -68,6 +82,97 @@ public class BuilderProxy implements InvocationHandler {
         }
 
         return instance;
+    }
+
+    private Constructor findMatchingConstructor(Object[] params) throws NoSuchMethodException {
+        if (params == null || params.length == 0) {
+            // use default (empty) constructor
+            return builtClass.getConstructor();
+        }
+
+        Class<?>[] paramTypes = extractTypesFromValues(params);
+
+        List<Constructor<?>> candidates = findCandidateConstructors(paramTypes);
+
+        if (candidates.isEmpty()) {
+            throw new IllegalArgumentException(String.format(
+                    "No constructor found on class [%s] that matches signature (%s)",
+                    builtClass, Arrays.toString(paramTypes)));
+        } else if (candidates.size() > 1) {
+            throw new IllegalArgumentException(String.format(
+                    "Found %s constructors matching signature (%s) on class [%s], which is too ambiguous to proceed.",
+                    candidates.size(), Arrays.toString(paramTypes), builtClass));
+        } else {
+            return candidates.get(0);
+        }
+    }
+
+    private Class<?>[] extractTypesFromValues(Object[] params) {
+        Class<?>[] paramTypes = new Class<?>[params.length];
+        for (int i = 0; i < params.length; i++) {
+            Object param = params[i];
+
+            paramTypes[i] = (param == null) ? null : param.getClass();
+        }
+        return paramTypes;
+    }
+
+    private List<Constructor<?>> findCandidateConstructors(Class<?>[] paramTypes) {
+        Constructor<?>[] allConstructors = builtClass.getDeclaredConstructors();
+        List<Constructor<?>> candidates = new ArrayList<Constructor<?>>();
+        for (Constructor<?> constructor : allConstructors) {
+
+            Class<?>[] constructorParamTypes = constructor.getParameterTypes();
+            if (constructorParamTypes.length != paramTypes.length) {
+                continue;
+            }
+
+            // if all param types match constructor argument types (null always matching), then consider as candidate
+            if (typesAreCompatible(paramTypes, constructorParamTypes)) {
+                candidates.add(constructor);
+            }
+        }
+        return candidates;
+    }
+
+    private boolean typesAreCompatible(Class<?>[] paramTypes, Class<?>[] constructorParamTypes) {
+        boolean matches = true;
+        for (int i = 0; i < paramTypes.length; i++) {
+            Class<?> paramType = paramTypes[i];
+            if (paramType != null) {
+
+                Class<?> inputParamType = translateFromPrimitive(paramType);
+                Class<?> constructorParamType = translateFromPrimitive(constructorParamTypes[i]);
+
+                if (!inputParamType.isAssignableFrom(constructorParamType)) {
+                    matches = false;
+                    break;
+                }
+            }
+        }
+        return matches;
+    }
+
+    private Class<?> translateFromPrimitive(Class<?> paramType) {
+        if (paramType == int.class) {
+            return Integer.class;
+        } else if (paramType == char.class) {
+            return Float.class;
+        } else if (paramType == byte.class) {
+            return Float.class;
+        } else if (paramType == long.class) {
+            return Long.class;
+        } else if (paramType == short.class) {
+            return Short.class;
+        } else if (paramType == boolean.class) {
+            return Boolean.class;
+        } else if (paramType == double.class) {
+            return Double.class;
+        } else if (paramType == float.class) {
+            return Float.class;
+        } else {
+            return paramType;
+        }
     }
 
     private void setTargetProperty(Object target, String property, Object value) throws Exception {
@@ -120,6 +225,12 @@ public class BuilderProxy implements InvocationHandler {
         }
 
         return transformed;
+    }
+
+    private void buildIfBuilderInstances(Object[] params) {
+        for (int i = 0; i < params.length; i++) {
+            params[i] = buildIfBuilderInstance(params[i]);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -217,7 +328,7 @@ public class BuilderProxy implements InvocationHandler {
                 "Method [%s] does not seem to represent a setter for a property", methodName));
     }
 
-    private boolean isBuild(Method method) {
+    private boolean isBuildMethod(Method method) {
         if (hasBuilderDelegate()) {
             return builderDelegate.isBuildMethod(method);
         }

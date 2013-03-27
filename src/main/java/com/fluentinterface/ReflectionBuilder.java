@@ -91,7 +91,7 @@ public class ReflectionBuilder<T> {
 
         public InternalBuilderAsSuperClassDelegate() {
             try {
-                this.buildMethod = Builder.class.getMethod(BUILD_METHOD_NAME);
+                this.buildMethod = Builder.class.getDeclaredMethod(BUILD_METHOD_NAME, Object[].class);
             } catch (NoSuchMethodException e) {
                 throw new IllegalStateException(
                         String.format("Could not find [%s] method on [%s] class.", BUILD_METHOD_NAME, Builder.class),

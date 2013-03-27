@@ -15,6 +15,7 @@ import java.util.ArrayDeque;
 import static com.fluentinterface.ReflectionBuilder.implementationFor;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.collection.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
@@ -202,12 +203,47 @@ public class BuilderProxyTest {
     }
 
     @Test
-    public void souldCopyCollectionDirectlyWhenNotSupported() {
+    public void shouldCopyCollectionDirectlyWhenNotSupported() {
 
         ArrayDeque queue = new ArrayDeque();
         Person built = personBuilder.withQueue(queue).build();
 
         assert built.getQueue() == queue;
+    }
+
+    @Test
+    public void shouldCallSpecificConstructorWhenBuildMethodCalledWithParameters() {
+
+        Person person = personBuilder.build("Jeremy", 3);
+
+        assertThat(person.getName(), is("Jeremy"));
+        assertThat(person.getAge(), is(3));
+    }
+
+    @Test
+    public void shouldCallSpecificConstructorWhenBuildMethodCalledWithParametersWithNullValue() {
+
+        Person person = personBuilder.build("Jeremy", 3, null);
+
+        assertThat(person.getName(), is("Jeremy"));
+        assertThat(person.getAge(), is(3));
+        assertThat(person.getPartner(), is(nullValue()));
+    }
+
+    @Test
+    public void shouldUseBuilderWhenPassedInBuildMethodArguments() {
+
+        Person person = personBuilder.build("Jeremy", 3, aPerson().withName("Suzana"));
+
+        assertThat(person.getName(), is("Jeremy"));
+        assertThat(person.getAge(), is(3));
+        assertThat(person.getPartner().getName(), is("Suzana"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldFailWhenMultipleConstructorsMatchBuildMethodArguments() {
+
+        personBuilder.build(null, 3);
     }
 
     @Test(expected = IllegalStateException.class)

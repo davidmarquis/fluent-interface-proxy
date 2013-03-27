@@ -80,6 +80,7 @@ All you need to make sure is that you follow a few conventions when designing yo
  * Supports any type of property by simply copying the value passed in the builder to the bean's property.
  * Supports varargs arguments in builders that can be directly copied to an array property on the target bean, or transformed as any Collection.
  * Supports setting bean values using both public setters and using private fields directly.
+ * Supports using non-empty constructors on your beans
  * Whenever a Builder is encountered in your Builder interface's methods, this builder will be asked to build the object prior to setting the target bean's property value.
 
 ## Tips for designing your builder interfaces
@@ -93,10 +94,10 @@ All you need to make sure is that you follow a few conventions when designing yo
     We're using the Builder pattern, eh?
  * **For multi-valued properties (arrays or collections), you can use varargs in your interface.**
     The framework will automatically convert to set the correct value on the target bean (even collections!).
- * **You may use a `Builder` in place of any bean in your builder.**
-    The Builder's build() method will automatically be called and the resulting bean will be set on the target bean's property.
+ * **You may use a `Builder` in place of any bean in your builder methods.**
+    The Builder's `build()` method will automatically be called and the resulting bean will be set on the target bean's property.
  * **By default, your builder interface should extend the `Builder<T>` interface provided in the framework.**
-    This interface has a single method: `T build()`. If extending this interface is too invasive (I understand why it would be in some cases),
+    This interface has a single method: `T build(Object...)`. If extending this interface is too invasive (I understand why it would be in some cases),
     you can use your own super interface, but you have to provide custom code to 'plug it in' (see below).
 
 ## Using your own `build` method
@@ -122,7 +123,7 @@ The library supports both setting the target bean's attributes using public sett
 By default, public setters are used. You may choose to use fields directly using this:
 
 ``` java
-ReflectionBuilder.implementationFor(YourBean.class)
+ReflectionBuilder.implementationFor(YourBuilder.class)
         .usingFieldsDirectly()
         .create();
 ```
@@ -136,6 +137,43 @@ ReflectionBuilder.implementationFor(YourBean.class)
         .usingAttributeAccessStrategy(yourStrategy)
         .create();
 ```
+
+## Using non-empty constructors
+
+Sometimes the beans you are building may have only non-empty constructors available, or you may require the use of a specific constructor
+when using your dynamic builder. Since version 1.2.0, the library supports calling specific constructors using the build() method:
+
+Your bean:
+
+``` java
+public class Person {
+
+    private String name;
+    private int age;
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+
+Using the multi argument constructor using the dynamic builder:
+
+``` java
+PersonBuilder aPerson = ReflectionBuilder.implementationFor(PersonBuilder.class).create();
+
+Person person = aPerson.build("Jeremy", 25);
+```
+
+The library will check all available constructors on your target bean's class and will find the right constructor to use from the types
+ of the parameters you pass to the `build(Object...)` method.
+
+There are limitations however:
+
+ * Nulls have the effect of being considered as wildcards when the library tries to find a matching constructor. If many
+ constructors match because of that, an error will be thrown because the library cannot know for sure which constructor you intended to use.
+ * When no constructor match the signature you provided to the `build(Object...)` method, an error will also be thrown.
 
 ## Other documentation
 

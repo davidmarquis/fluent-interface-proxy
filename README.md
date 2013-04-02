@@ -181,15 +181,25 @@ Have a look at the tests defined in the `test` folder to see some sample usages 
 
 ## Using the code
 
-### Using binaries directly
+### Maven dependency
 
-A packaged JAR of the builds is available in the [releases folder](https://github.com/davidmarquis/fluent-interface-proxy/tree/master/releases).
+The project is published to the Maven Central repository. To use it in your Maven project, add this dependency to your `pom.xml`:
 
-### Using Maven
+``` xml
+<dependency>
+    <groupId>com.github.davidmarquis</groupId>
+    <artifactId>fluent-interface-proxy</artifactId>
+    <version>1.3.0</version>
+</dependency>
+```
 
-This project is not currently published on the Maven Central repository, so you have to checkout the project locally,
-then build and install the artifact in your own repository. I do plan to publish the artifact on Maven Central as soon
-as possible however. Stay tuned!
+### Building from sources
+
+You can build from sources using Maven by running:
+
+```
+mvn clean package
+```
 
 ## Future features (wishlist)
 

@@ -8,6 +8,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.fluentinterface.utils.ConversionUtils.translateFromPrimitive;
+
 /**
  * A dynamic proxy which will build a bean of the target type upon calls to the implemented interface.
  */
@@ -151,28 +153,6 @@ public class BuilderProxy implements InvocationHandler {
             }
         }
         return matches;
-    }
-
-    private Class<?> translateFromPrimitive(Class<?> paramType) {
-        if (paramType == int.class) {
-            return Integer.class;
-        } else if (paramType == char.class) {
-            return Float.class;
-        } else if (paramType == byte.class) {
-            return Float.class;
-        } else if (paramType == long.class) {
-            return Long.class;
-        } else if (paramType == short.class) {
-            return Short.class;
-        } else if (paramType == boolean.class) {
-            return Boolean.class;
-        } else if (paramType == double.class) {
-            return Double.class;
-        } else if (paramType == float.class) {
-            return Float.class;
-        } else {
-            return paramType;
-        }
     }
 
     private void setTargetProperty(Object target, String property, Object value) throws Exception {

@@ -29,6 +29,14 @@ public class ReflectionBuilderTest {
     }
 
     @Test(expected = IllegalStateException.class)
+    public void shouldNotImplyBuiltClassFromNoInterfaceAtAll() {
+
+        ReflectionBuilder<DefinitelyNotABuilder> reflectionBuilder = implementationFor(DefinitelyNotABuilder.class);
+
+        reflectionBuilder.getBuiltClass();
+    }
+
+    @Test(expected = IllegalStateException.class)
     public void shouldNotImplyBuiltClassFromMultipleNonBuilderInterfaces() {
 
         ReflectionBuilder<NotABuilder> reflectionBuilder = implementationFor(NotABuilder.class);
@@ -41,4 +49,6 @@ public class ReflectionBuilderTest {
     private static interface PersonWithAnotherInterfaceBuilder extends Serializable, Builder<Person> {}
 
     private static interface NotABuilder extends Serializable, Comparable {}
+
+    private static interface DefinitelyNotABuilder {}
 }

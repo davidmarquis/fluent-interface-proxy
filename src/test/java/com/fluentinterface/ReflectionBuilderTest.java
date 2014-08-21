@@ -28,7 +28,17 @@ public class ReflectionBuilderTest {
         assertThat(reflectionBuilder.getBuiltClass(), typeCompatibleWith(Person.class));
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void shouldNotImplyBuiltClassFromMultipleNonBuilderInterfaces() {
+
+        ReflectionBuilder<NotABuilder> reflectionBuilder = implementationFor(NotABuilder.class);
+
+        reflectionBuilder.getBuiltClass();
+    }
+
     private static interface PersonBuilder extends Builder<Person> {}
 
     private static interface PersonWithAnotherInterfaceBuilder extends Serializable, Builder<Person> {}
+
+    private static interface NotABuilder extends Serializable, Comparable {}
 }

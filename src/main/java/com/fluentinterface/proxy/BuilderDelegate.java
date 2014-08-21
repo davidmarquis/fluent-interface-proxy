@@ -19,6 +19,15 @@ import java.lang.reflect.Method;
  * @param <B> Type for builders the delegate handles.
  */
 public interface BuilderDelegate<B> {
+
+    /**
+     * Implementation should determine which type of object the provided Builder builds.
+     * Typically this would be determined via the Reflection API.
+     * @param builderInterface interface of the builder being created.
+     * @return the type of object that the Builder builds.
+     */
+    Class<?> getClassBuiltBy(Class<?> builderInterface);
+
     /**
      * Implementation has to call the right method on the target builder in order to create an instance of
      * the object being built.

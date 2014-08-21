@@ -18,7 +18,7 @@ public class ReflectionBuilder<T> {
 
     private BuilderDelegate<? super T> builderDelegate;
     private Class<T> builderInterface;
-    private Class<?> builtClass;
+    private Class<?> builtClass = null;
     private AttributeAccessStrategy attributeAccessStrategy;
 
     @SuppressWarnings("unchecked")
@@ -29,7 +29,6 @@ public class ReflectionBuilder<T> {
         }
 
         this.builderInterface = builderInterface;
-        this.builtClass = implyBuiltClassFromImplementedInterface(builderInterface);
         this.builderDelegate = defaultBuilderDelegate;
         this.attributeAccessStrategy = new SetterAttributeAccessStrategy();
     }
@@ -62,8 +61,13 @@ public class ReflectionBuilder<T> {
         return this;
     }
 
-    @SuppressWarnings("unchecked")
-    public T create() {
+    public Class<?> getBuiltClass() {
+        if (builtClass != null) {
+            return builtClass;
+        }
+
+        builtClass = builderDelegate.getClassBuiltBy(builderInterface);
+
         if (builtClass == null) {
             throw new IllegalStateException(String.format(
                     "Could not imply class being built by builder [%s]. " +
@@ -72,16 +76,18 @@ public class ReflectionBuilder<T> {
             ));
         }
 
-        InvocationHandler handler = new BuilderProxy(builderInterface, builtClass, builderDelegate, attributeAccessStrategy);
+        return builtClass;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T create() {
+
+        InvocationHandler handler = new BuilderProxy(builderInterface, getBuiltClass(), builderDelegate, attributeAccessStrategy);
 
         return (T) Proxy.newProxyInstance(
                 builderInterface.getClassLoader(),
                 new Class[]{builderInterface},
                 handler);
-    }
-
-    private Class<?> implyBuiltClassFromImplementedInterface(Class<?> proxied) {
-        return GenericsUtils.getGenericTypeOf(proxied);
     }
 
     private static class InternalBuilderAsSuperClassDelegate implements BuilderDelegate<Builder> {
@@ -100,14 +106,22 @@ public class ReflectionBuilder<T> {
             }
         }
 
+        @Override
+        public Class<?> getClassBuiltBy(Class<?> builderInterface) {
+            return GenericsUtils.getDeclaredGenericType(builderInterface, Builder.class);
+        }
+
+        @Override
         public Object build(Builder builder) {
             return builder.build();
         }
 
+        @Override
         public boolean isBuilderInstance(Object value) {
             return value instanceof Builder;
         }
 
+        @Override
         public boolean isBuildMethod(Method method) {
             return method.equals(buildMethod);
         }

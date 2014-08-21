@@ -317,7 +317,8 @@ public class BuilderProxy implements InvocationHandler {
 
     private boolean isFluentSetter(Method method) {
         return method.getParameterTypes().length == 1
-                && method.getReturnType() == proxied;
+                && method.getReturnType().isAssignableFrom(this.proxied)
+                && !this.isBuildMethod(method);
     }
 
     private String uncapitalize(String source) {

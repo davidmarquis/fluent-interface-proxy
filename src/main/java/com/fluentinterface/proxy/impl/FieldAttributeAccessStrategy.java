@@ -42,7 +42,26 @@ public class FieldAttributeAccessStrategy implements AttributeAccessStrategy {
         try {
             return clazz.getDeclaredField(fieldName);
         } catch (NoSuchFieldException e) {
+        	return getFieldsFromHierarchy(clazz, fieldName);
+        }
+    }
+    
+    private static Field getFieldsFromHierarchy(Class<?> clazz, String fieldName) {
+        Field result;
+        Class<?> parent = clazz.getSuperclass();
+
+        if (parent == null) {
             return null;
         }
+
+
+        try {
+            result = parent.getDeclaredField(fieldName); 
+        } catch (NoSuchFieldException e) {
+            result = getFieldsFromHierarchy(parent, fieldName);
+        }
+
+
+        return result;
     }
 }

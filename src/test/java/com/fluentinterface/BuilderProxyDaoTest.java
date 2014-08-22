@@ -50,14 +50,12 @@ public class BuilderProxyDaoTest {
 
     private CustomerBuilder aCustomer(){
         return implementationFor(CustomerBuilder.class)
-                .builds(Customer.class)
                 .usingAttributeAccessStrategy(attributeAccessStrategy)
                 .create();
     }
 
     private EmployeeBuilder anEmployee(){
         return implementationFor(EmployeeBuilder.class)
-                .builds(Employee.class)
                 .usingAttributeAccessStrategy(attributeAccessStrategy)
                 .create();
     }

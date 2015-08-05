@@ -187,7 +187,7 @@ public class BuilderProxyTest {
                 .withAgesOfMarriages(23, 45)
                 .build();
 
-        assertThat(built.getAgesOfMarriages(), is(new int[] {23, 45}));
+        assertThat(built.getAgesOfMarriages(), is(new int[]{23, 45}));
     }
 
     @Test
@@ -238,6 +238,18 @@ public class BuilderProxyTest {
         assertThat(person.getName(), is("Jeremy"));
         assertThat(person.getAge(), is(3));
         assertThat(person.getPartner().getName(), is("Suzana"));
+    }
+
+    @Test
+    public void shouldSetPropertyUserSetsAnnotation() {
+
+        Person built = personBuilder
+                .named("John Smith")
+                .aged(20)
+                .build();
+
+        assertThat(built.getName(), is("John Smith"));
+        assertThat(built.getAge(), is(20));
     }
 
     @Test(expected = IllegalArgumentException.class)

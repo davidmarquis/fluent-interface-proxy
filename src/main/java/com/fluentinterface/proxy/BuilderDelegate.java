@@ -10,11 +10,11 @@ import java.lang.reflect.Method;
  * Use this delegate when creating your dynamic builders.
  *
  * Ex:
- * <code>
- *     ReflectionBuilder.implementationFor(YourBuilder.class)
- *          .withDelegate(new YourDelegate())
- *          .create();
- * </code>
+ * <pre>
+ * ReflectionBuilder.implementationFor(YourBuilder.class)
+ *      .withDelegate(new YourDelegate())
+ *      .create();
+ * </pre>
  *
  * @param <B> Type for builders the delegate handles.
  */

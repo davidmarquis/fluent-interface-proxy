@@ -1,5 +1,7 @@
 package com.fluentinterface.proxy;
 
+import com.fluentinterface.annotation.Sets;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
@@ -294,11 +296,16 @@ public class BuilderProxy implements InvocationHandler {
     }
 
     private String extractPropertyNameFrom(Method method) {
+        String propertyName = extractPropertyNameFromSetsAnnotation(method);
+        if (propertyName != null) {
+            return propertyName;
+        }
+
         String methodName = method.getName();
         Matcher propertyNameMatcher = BUILDER_METHOD_PROPERTY_PATTERN.matcher(methodName);
 
         if (propertyNameMatcher.matches()) {
-            String propertyName = propertyNameMatcher.group(1);
+            propertyName = propertyNameMatcher.group(1);
             if (propertyName != null) {
                 return uncapitalize(propertyName);
             }
@@ -306,6 +313,11 @@ public class BuilderProxy implements InvocationHandler {
 
         throw new IllegalStateException(String.format(
                 "Method [%s] does not seem to represent a setter for a property", methodName));
+    }
+
+    private String extractPropertyNameFromSetsAnnotation(Method method) {
+        Sets setsAnnotation = method.getAnnotation(Sets.class);
+        return setsAnnotation != null ? setsAnnotation.property() : null;
     }
 
     private boolean isBuildMethod(Method method) {

@@ -44,11 +44,11 @@ public class ReflectionBuilderTest {
         reflectionBuilder.getBuiltClass();
     }
 
-    private static interface PersonBuilder extends Builder<Person> {}
+    private interface PersonBuilder extends Builder<Person> {}
 
-    private static interface PersonWithAnotherInterfaceBuilder extends Serializable, Builder<Person> {}
+    private interface PersonWithAnotherInterfaceBuilder extends Serializable, Builder<Person> {}
 
-    private static interface NotABuilder extends Serializable, Comparable {}
+    private interface NotABuilder extends Serializable, Comparable {}
 
-    private static interface DefinitelyNotABuilder {}
+    private interface DefinitelyNotABuilder {}
 }

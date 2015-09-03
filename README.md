@@ -203,7 +203,7 @@ The project is published to the Maven Central repository. To use it in your Mave
 <dependency>
     <groupId>com.github.davidmarquis</groupId>
     <artifactId>fluent-interface-proxy</artifactId>
-    <version>1.3.0</version>
+    <version>1.3.1</version>
 </dependency>
 ```
 

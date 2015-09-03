@@ -10,7 +10,7 @@
 
     <groupId>com.github.davidmarquis</groupId>
     <artifactId>fluent-interface-proxy</artifactId>
-    <version>1.3.1-SNAPSHOT</version>
+    <version>1.3.1</version>
     <packaging>jar</packaging>
 
     <name>fluent-interface-proxy</name>
@@ -29,7 +29,8 @@
         <connection>scm:git:git@github.com:davidmarquis/fluent-interface-proxy.git</connection>
         <developerConnection>scm:git:git@github.com:davidmarquis/fluent-interface-proxy.git</developerConnection>
         <url>git@github.com:davidmarquis/fluent-interface-proxy.git</url>
-    </scm>
+      <tag>fluent-interface-proxy-1.3.1</tag>
+  </scm>
 
     <developers>
         <developer>

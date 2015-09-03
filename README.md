@@ -80,6 +80,7 @@ All you need to make sure is that you follow a few conventions when designing yo
  * Supports any type of property by simply copying the value passed in the builder to the bean's property.
  * Supports varargs arguments in builders that can be directly copied to an array property on the target bean, or transformed as any Collection.
  * Supports setting bean values using both public setters and using private fields directly.
+ * Supports non-standard property-setting methods **NEW**
  * Supports using non-empty constructors on your beans
  * Whenever a Builder is encountered in your Builder interface's methods, this builder will be asked to build the object prior to setting the target bean's property value.
 
@@ -116,7 +117,6 @@ ReflectionBuilder.implementationFor(YourBean.class)
 Have a look at the `BuilderDelegate` interface, as well as the default implementation of this interface in `ReflectionBuilder` for more
 details on what to provide in your implementation.
 
-
 ## Choosing between setters or private fields
 
 The library supports both setting the target bean's attributes using public setters or private fields (using the Reflection API).
@@ -136,6 +136,20 @@ AttributeAccessStrategy yourStrategy = new YourStrategy();  // implements Attrib
 ReflectionBuilder.implementationFor(YourBean.class)
         .usingAttributeAccessStrategy(yourStrategy)
         .create();
+```
+
+## Defining non-standard property-setting methods
+
+The library defines a naming convention for property-setting methods. But for more flexibility, it is possible to define your own method names using the `Sets` annotation:
+
+```java
+public interface PersonBuilder extends Builder<Person> {
+    @Sets(property = "name")
+    PersonBuilder named(String name);
+    @Sets(property = "age")
+    PersonBuilder aged(String age);
+    ...
+}
 ```
 
 ## Using non-empty constructors
@@ -209,15 +223,3 @@ Here are some features I'd like to eventually add to the project:
     Allows for use cases where inputs as strings are used directly (I am mostly thinking of functional testing frameworks
     like Fitnesse (fixtures) or Cucumber)
  * Support for specifying custom handlers for builder methods. Could allow: `aPerson().named("Joe").aged(45).build()`
- * Configuration of the non-standard builder methods through annotations. Something like:
-
-```java
-public interface PersonBuilder extends Builder<Person> {
-    @Sets(property = "name")
-    PersonBuilder named(String name);
-    @Sets(property = "age", convertTo = int.class)
-    PersonBuilder aged(String age);
-    ...
-}
-```
-

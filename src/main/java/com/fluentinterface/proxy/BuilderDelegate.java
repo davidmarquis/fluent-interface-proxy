@@ -6,8 +6,9 @@ import java.lang.reflect.Method;
  * This interface allows for using a custom "Builder" base interface in your project. Please note that a default
  * BuilderDelegate implementation is already provided. You do not need to provide a custom delegate if you use
  * the provided Builder interface as your own builders' super interface (which is recommended).
- * <p/>
+ * <p>
  * Use this delegate when creating your dynamic builders.
+ * </p>
  *
  * Ex:
  * <pre>

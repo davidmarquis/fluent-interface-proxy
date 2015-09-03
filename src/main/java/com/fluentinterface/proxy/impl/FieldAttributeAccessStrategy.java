@@ -1,8 +1,8 @@
 package com.fluentinterface.proxy.impl;
 
-import com.fluentinterface.proxy.AttributeAccessStrategy;
-
 import java.lang.reflect.Field;
+
+import com.fluentinterface.proxy.AttributeAccessStrategy;
 
 /**
  * Strategy that sets the target bean's attributes directly using the Reflection API (without going through the setters).
@@ -42,7 +42,16 @@ public class FieldAttributeAccessStrategy implements AttributeAccessStrategy {
         try {
             return clazz.getDeclaredField(fieldName);
         } catch (NoSuchFieldException e) {
+            return findFieldFromAncestors(clazz, fieldName);
+        }
+    }
+
+    private Field findFieldFromAncestors(Class<?> clazz, String fieldName) {
+        Class<?> parent = clazz.getSuperclass();
+
+        if (parent == Object.class) {
             return null;
         }
+        return getFieldFromClass(parent, fieldName);
     }
 }

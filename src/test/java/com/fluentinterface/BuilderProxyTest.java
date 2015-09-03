@@ -203,7 +203,7 @@ public class BuilderProxyTest {
     }
 
     @Test
-    public void shouldCopyCollectionDirectlyWhenNotSupported() {
+    public void shouldCopyCollectionByReferenceWhenCollectionTypeNotSupported() {
 
         ArrayDeque queue = new ArrayDeque();
         Person built = personBuilder.withQueue(queue).build();

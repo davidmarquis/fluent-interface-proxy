@@ -25,7 +25,7 @@ public class GenericsUtils {
                     if (type instanceof ParameterizedType) {
                         rawType = (Class<?>) ((ParameterizedType) type).getRawType();
                     } else {
-                        rawType = (Class<?>) paramType.getActualTypeArguments()[0];
+                        rawType = (Class<?>) type;
                     }
 
                     return rawType;

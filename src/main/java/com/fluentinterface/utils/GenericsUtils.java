@@ -21,14 +21,14 @@ public class GenericsUtils {
 
                     Type type = paramType.getActualTypeArguments()[0];
 
-                    Class<?> inferredClazz;
+                    Class<?> rawType;
                     if (type instanceof ParameterizedType) {
-                        inferredClazz = (Class<?>) ((ParameterizedType) type).getRawType();
+                        rawType = (Class<?>) ((ParameterizedType) type).getRawType();
                     } else {
-                        inferredClazz = (Class<?>) paramType.getActualTypeArguments()[0];
+                        rawType = (Class<?>) paramType.getActualTypeArguments()[0];
                     }
 
-                    return inferredClazz;
+                    return rawType;
                 }
             }
         }

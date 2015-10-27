@@ -1,8 +1,8 @@
 package com.fluentinterface;
 
 import com.fluentinterface.domain.Person;
-import com.fluentinterface.domain.TypedID;
-import com.fluentinterface.domain.TypedIDBuilder;
+import com.fluentinterface.domain.TypedStringID;
+import com.fluentinterface.domain.TypedStringIDBuilder;
 import org.junit.Test;
 
 import static com.fluentinterface.ReflectionBuilder.implementationFor;
@@ -11,14 +11,14 @@ import static org.junit.Assert.assertThat;
 
 public class TypedBuilderProxyTest {
 
-    private TypedIDBuilder<Person> personTypedIDBuilder = implementationFor(TypedIDBuilder.class)
+    private TypedStringIDBuilder<Person> personTypedStringIDBuilder = implementationFor(TypedStringIDBuilder.class)
             .usingFieldsDirectly()
             .create();
 
     @Test
     public void shouldSetPropertyValueString() {
 
-        TypedID<Person> built = personTypedIDBuilder
+        TypedStringID<Person> built = personTypedStringIDBuilder
                 .withId("John Smith")
                 .build();
 

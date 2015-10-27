@@ -18,9 +18,12 @@ public class GenericsUtils {
             if (genericType instanceof ParameterizedType) {
                 ParameterizedType paramType = (ParameterizedType) genericType;
                 if (paramType.getRawType().equals(genericInterface)) {
-
                     Type type = paramType.getActualTypeArguments()[0];
 
+                    /**
+                     * Test if the declared generic type is also generic,
+                     * and if so return the raw type class
+                     */
                     Class<?> rawType;
                     if (type instanceof ParameterizedType) {
                         rawType = (Class<?>) ((ParameterizedType) type).getRawType();

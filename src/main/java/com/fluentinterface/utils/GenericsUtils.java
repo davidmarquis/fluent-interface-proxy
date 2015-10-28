@@ -9,6 +9,9 @@ public class GenericsUtils {
 
     /**
      * Finds the generic type declared on a single interface implemented by the provided class.
+     * If the generic type is itself a generic type (ex: <pre>SomeType<SomeOtherType<T>></pre>,
+     * the actal raw type will be returned (in the example, SomeOtherType would be returned).
+     *
      * @param clazz the class on which we want to find the generic type.
      * @return the actual type declared on the provided generic interface.
      */
@@ -19,22 +22,24 @@ public class GenericsUtils {
                 ParameterizedType paramType = (ParameterizedType) genericType;
                 if (paramType.getRawType().equals(genericInterface)) {
                     Type type = paramType.getActualTypeArguments()[0];
-
-                    /**
-                     * Test if the declared generic type is also generic,
-                     * and if so return the raw type class
-                     */
-                    Class<?> rawType;
-                    if (type instanceof ParameterizedType) {
-                        rawType = (Class<?>) ((ParameterizedType) type).getRawType();
-                    } else {
-                        rawType = (Class<?>) type;
-                    }
-
-                    return rawType;
+                    return getActualRawType(type);
                 }
             }
         }
         return null;
+    }
+
+    /**
+     * Java's introspection API differentiates between a raw type and a generic (parameterized) type.
+     * To determine the actual raw type from a type, we need to take both cases into consideration.
+     */
+    private static Class<?> getActualRawType(Type type) {
+        Class<?> rawType;
+        if (type instanceof ParameterizedType) {
+            rawType = (Class<?>) ((ParameterizedType) type).getRawType();
+        } else {
+            rawType = (Class<?>) type;
+        }
+        return rawType;
     }
 }

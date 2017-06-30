@@ -27,6 +27,9 @@ public class BestMatchingConstructor implements Instantiator {
     public Object instantiate() throws InstantiationException {
         try {
             Constructor<?> constructor = findMatchingConstructor(params);
+            if (!constructor.isAccessible()) {
+                constructor.setAccessible(true);
+            }
             return constructor.newInstance(params);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
@@ -37,7 +40,7 @@ public class BestMatchingConstructor implements Instantiator {
     private Constructor findMatchingConstructor(Object[] params) throws NoSuchMethodException {
         if (params == null || params.length == 0) {
             // use default (empty) constructor
-            return builtClass.getConstructor();
+            return builtClass.getDeclaredConstructor();
         }
 
         Class<?>[] paramTypes = extractTypesFromValues(params);

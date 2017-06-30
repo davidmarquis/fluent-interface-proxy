@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Utility builder to create a map with a fluent API. Because this build implements the `Builder<>` interface, it can be
- * used directly in other builders as parameters, without the need to call `build()`.
+ * Utility builder to create a map with a fluent API. Because this builder implements the `Builder<>` interface, it can
+ * be used directly in other builders as parameters, without the need to call `build()`.
  *
  * Direct usage:
  * ```
@@ -59,7 +59,7 @@ public class MapBuilder<K, V> implements Builder<Map<K, V>> {
     }
 
     @Override
-    public Map<K, V> build(Object... constructorArgs) {
+    public Map<K, V> build(Object... ignored) {
         return built;
     }
 }

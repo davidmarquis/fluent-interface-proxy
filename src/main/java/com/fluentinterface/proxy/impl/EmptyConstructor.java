@@ -5,10 +5,10 @@ import com.fluentinterface.proxy.Instantiator;
 /**
  * Instantiates an object using its default empty constructor.
  */
-public class EmptyConstructorInstantiator implements Instantiator {
+public class EmptyConstructor implements Instantiator {
     private Class targetClass;
 
-    public EmptyConstructorInstantiator(Class targetClass) {
+    public EmptyConstructor(Class targetClass) {
         this.targetClass = targetClass;
     }
 

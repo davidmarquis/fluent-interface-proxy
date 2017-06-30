@@ -3,7 +3,7 @@ package com.fluentinterface.proxy;
 import com.fluentinterface.annotation.Constructs;
 import com.fluentinterface.proxy.impl.BestMatchingConstructor;
 import com.fluentinterface.proxy.impl.BuildWithBuilderConverter;
-import com.fluentinterface.proxy.impl.EmptyConstructorInstantiator;
+import com.fluentinterface.proxy.impl.EmptyConstructor;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -23,7 +23,9 @@ public class BuilderProxy implements InvocationHandler {
     private Map<PropertySetter, Object> settersWithValues;
     private Instantiator instantiator;
 
-    public BuilderProxy(Class builderInterface, Class builtClass, BuilderDelegate builderDelegate,
+    public BuilderProxy(Class builderInterface,
+                        Class builtClass,
+                        BuilderDelegate builderDelegate,
                         PropertyAccessStrategy propertyAccessStrategy) {
 
         this.proxied = builderInterface;
@@ -32,7 +34,7 @@ public class BuilderProxy implements InvocationHandler {
         this.propertyAccessStrategy = propertyAccessStrategy;
 
         this.settersWithValues = new LinkedHashMap<>();
-        this.instantiator = new EmptyConstructorInstantiator(builtClass);
+        this.instantiator = new EmptyConstructor(builtClass);
     }
 
     public Object invoke(Object target, Method method, Object[] params) throws Throwable {

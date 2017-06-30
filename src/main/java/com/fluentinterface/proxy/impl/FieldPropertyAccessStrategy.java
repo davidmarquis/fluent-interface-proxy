@@ -1,13 +1,13 @@
 package com.fluentinterface.proxy.impl;
 
-import java.lang.reflect.Field;
+import com.fluentinterface.proxy.PropertyAccessStrategy;
 
-import com.fluentinterface.proxy.AttributeAccessStrategy;
+import java.lang.reflect.Field;
 
 /**
  * Strategy that sets the target bean's attributes directly using the Reflection API (without going through the setters).
  */
-public class FieldAttributeAccessStrategy implements AttributeAccessStrategy {
+public class FieldPropertyAccessStrategy implements PropertyAccessStrategy {
 
     public boolean hasProperty(Class<?> builtClass, String property) {
 
@@ -16,12 +16,15 @@ public class FieldAttributeAccessStrategy implements AttributeAccessStrategy {
         return field != null;
     }
 
-    public Class getPropertyType(Object target, String property) throws Exception {
-        if (target == null) {
+    public Class getPropertyType(Class targetClass, String property) {
+        if (targetClass == null) {
             return null;
         }
 
-        Field field = getFieldFromClass(target.getClass(), property);
+        Field field = getFieldFromClass(targetClass, property);
+        if (field == null) {
+            throw new IllegalStateException(String.format("No property named '%s' was found on class %s", property, targetClass));
+        }
         return field.getType();
     }
 

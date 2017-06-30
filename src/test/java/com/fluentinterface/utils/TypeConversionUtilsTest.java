@@ -2,10 +2,10 @@ package com.fluentinterface.utils;
 
 import org.junit.Test;
 
-import static com.fluentinterface.utils.ConversionUtils.translateFromPrimitive;
+import static com.fluentinterface.utils.TypeConversionUtils.translateFromPrimitive;
 import static junit.framework.Assert.assertTrue;
 
-public class ConversionUtilsTest {
+public class TypeConversionUtilsTest {
 
     @Test
     public void testTranslateFromPrimitiveSupportedConversions() {

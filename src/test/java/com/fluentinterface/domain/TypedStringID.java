@@ -30,7 +30,7 @@ package com.fluentinterface.domain;
  *
  * }
  *
- * In this case the compiler will emmit an error when trying to set the boyId to the dogId
+ * In this case the compiler will emit an error when trying to set the boyId to the dogId
  * and vice versa. In addition, this serves as a hint to the IDE's auto completion.
  */
 public class TypedStringID<T> {

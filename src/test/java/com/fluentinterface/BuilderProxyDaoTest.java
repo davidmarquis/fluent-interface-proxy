@@ -1,25 +1,19 @@
 package com.fluentinterface;
 
-import static com.fluentinterface.ReflectionBuilder.implementationFor;
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import java.util.Calendar;
-
-import org.junit.Before;
+import com.fluentinterface.domain.dao.*;
+import com.fluentinterface.proxy.PropertyAccessStrategy;
+import com.fluentinterface.proxy.impl.FieldPropertyAccessStrategy;
+import com.fluentinterface.proxy.impl.SetterPropertyAccessStrategy;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import com.fluentinterface.domain.dao.Customer;
-import com.fluentinterface.domain.dao.CustomerBuilder;
-import com.fluentinterface.domain.dao.CustomerType;
-import com.fluentinterface.domain.dao.Employee;
-import com.fluentinterface.domain.dao.EmployeeBuilder;
-import com.fluentinterface.proxy.AttributeAccessStrategy;
-import com.fluentinterface.proxy.impl.FieldAttributeAccessStrategy;
-import com.fluentinterface.proxy.impl.SetterAttributeAccessStrategy;
+import java.util.Calendar;
+
+import static com.fluentinterface.ReflectionBuilder.implementationFor;
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @RunWith(Parameterized.class)
 public class BuilderProxyDaoTest {
@@ -27,42 +21,32 @@ public class BuilderProxyDaoTest {
     @Parameterized.Parameters
     public static Iterable<Object[]> strategies() {
         return asList(
-                new Object[] {new FieldAttributeAccessStrategy()},
-                new Object[] {new SetterAttributeAccessStrategy()}
+                new Object[] {new FieldPropertyAccessStrategy()},
+                new Object[] {new SetterPropertyAccessStrategy()}
                 );
     }
 
-    private CustomerBuilder customerBuilder;
+    private PropertyAccessStrategy propertyAccessStrategy;
 
-    private EmployeeBuilder employeeBuilder;
-
-    private AttributeAccessStrategy attributeAccessStrategy;
-
-    public BuilderProxyDaoTest(AttributeAccessStrategy attributeAccessStrategy) {
-        this.attributeAccessStrategy = attributeAccessStrategy;
-    }
-
-    @Before
-    public void setup() throws InstantiationException, IllegalAccessException {
-        customerBuilder = aCustomer();
-        employeeBuilder = anEmployee();
+    public BuilderProxyDaoTest(PropertyAccessStrategy propertyAccessStrategy) {
+        this.propertyAccessStrategy = propertyAccessStrategy;
     }
 
     private CustomerBuilder aCustomer(){
         return implementationFor(CustomerBuilder.class)
-                .usingAttributeAccessStrategy(attributeAccessStrategy)
+                .usingAttributeAccessStrategy(propertyAccessStrategy)
                 .create();
     }
 
     private EmployeeBuilder anEmployee(){
         return implementationFor(EmployeeBuilder.class)
-                .usingAttributeAccessStrategy(attributeAccessStrategy)
+                .usingAttributeAccessStrategy(propertyAccessStrategy)
                 .create();
     }
 
     @Test
     public void whenBuildCustomer() {
-        Customer customer = customerBuilder
+        Customer customer = aCustomer()
                 .withId("c-001").withVersion(1)
 
                 .withFirstName("Charlee")
@@ -75,13 +59,12 @@ public class BuilderProxyDaoTest {
 
         assertThat(customer.getFirstName(), is("Charlee"));
         assertThat(customer.getLastName(), is("Ch."));
-
     }
 
     @Test
     public void whenBuildEmployee() {
 
-        Employee employee = employeeBuilder
+        Employee employee = anEmployee()
                 .withId("c-001")
                 .withVersion(1)
 
@@ -104,7 +87,7 @@ public class BuilderProxyDaoTest {
 
     @Test
     public void shouldSetPropertyToEnum() {
-        Customer customer = customerBuilder
+        Customer customer = aCustomer()
                 .withType(CustomerType.BASIC)
                 .build();
 
@@ -114,7 +97,7 @@ public class BuilderProxyDaoTest {
     @Test
     public void shouldSetPropertyToCalendar() {
         Calendar calendar = Calendar.getInstance();
-        Customer customer = customerBuilder.withCreated(calendar).build();
+        Customer customer = aCustomer().withCreated(calendar).build();
 
         assertThat(customer.getCreated().getTimeInMillis(),
                 is(calendar.getTimeInMillis()));
@@ -122,7 +105,7 @@ public class BuilderProxyDaoTest {
 
     @Test
     public void shouleSetPropertyToDouble() {
-        Employee employee = employeeBuilder.withSalary(100.50D).build();
+        Employee employee = anEmployee().withSalary(100.50D).build();
 
         assertThat(employee.getSalary(), is(100.50D));
     }
@@ -130,6 +113,6 @@ public class BuilderProxyDaoTest {
     @Test(expected = IllegalStateException.class)
     public void shouldFailWhenBuilderUsesAnUnknownProperty() {
 
-        customerBuilder.withAnUnknownProperty("fails").build();
+        aCustomer().withAnUnknownProperty("fails").build();
     }
 }

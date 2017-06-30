@@ -1,11 +1,11 @@
 package com.fluentinterface;
 
 import com.fluentinterface.builder.Builder;
-import com.fluentinterface.proxy.AttributeAccessStrategy;
 import com.fluentinterface.proxy.BuilderDelegate;
 import com.fluentinterface.proxy.BuilderProxy;
-import com.fluentinterface.proxy.impl.FieldAttributeAccessStrategy;
-import com.fluentinterface.proxy.impl.SetterAttributeAccessStrategy;
+import com.fluentinterface.proxy.PropertyAccessStrategy;
+import com.fluentinterface.proxy.impl.FieldPropertyAccessStrategy;
+import com.fluentinterface.proxy.impl.SetterPropertyAccessStrategy;
 import com.fluentinterface.utils.GenericsUtils;
 
 import java.lang.reflect.InvocationHandler;
@@ -19,7 +19,7 @@ public class ReflectionBuilder<T> {
     private BuilderDelegate<? super T> builderDelegate;
     private Class<T> builderInterface;
     private Class<?> builtClass = null;
-    private AttributeAccessStrategy attributeAccessStrategy;
+    private PropertyAccessStrategy propertyAccessStrategy;
 
     @SuppressWarnings("unchecked")
     private ReflectionBuilder(Class<T> builderInterface) {
@@ -30,7 +30,7 @@ public class ReflectionBuilder<T> {
 
         this.builderInterface = builderInterface;
         this.builderDelegate = defaultBuilderDelegate;
-        this.attributeAccessStrategy = new SetterAttributeAccessStrategy();
+        this.propertyAccessStrategy = new SetterPropertyAccessStrategy();
     }
 
     public static void setDefaultBuilderDelegate(BuilderDelegate delegate) {
@@ -51,13 +51,13 @@ public class ReflectionBuilder<T> {
         return this;
     }
 
-    public ReflectionBuilder<T> usingAttributeAccessStrategy(AttributeAccessStrategy strategy) {
-        this.attributeAccessStrategy = strategy;
+    public ReflectionBuilder<T> usingAttributeAccessStrategy(PropertyAccessStrategy strategy) {
+        this.propertyAccessStrategy = strategy;
         return this;
     }
 
     public ReflectionBuilder<T> usingFieldsDirectly() {
-        this.attributeAccessStrategy = new FieldAttributeAccessStrategy();
+        this.propertyAccessStrategy = new FieldPropertyAccessStrategy();
         return this;
     }
 
@@ -82,7 +82,7 @@ public class ReflectionBuilder<T> {
     @SuppressWarnings("unchecked")
     public T create() {
 
-        InvocationHandler handler = new BuilderProxy(builderInterface, getBuiltClass(), builderDelegate, attributeAccessStrategy);
+        InvocationHandler handler = new BuilderProxy(builderInterface, getBuiltClass(), builderDelegate, propertyAccessStrategy);
 
         return (T) Proxy.newProxyInstance(
                 builderInterface.getClassLoader(),

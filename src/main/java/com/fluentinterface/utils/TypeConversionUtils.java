@@ -1,8 +1,8 @@
 package com.fluentinterface.utils;
 
-public class ConversionUtils {
+public class TypeConversionUtils {
 
-    private ConversionUtils() {}
+    private TypeConversionUtils() {}
 
     /**
      * From a primitive type class, tries to return the corresponding wrapper class.

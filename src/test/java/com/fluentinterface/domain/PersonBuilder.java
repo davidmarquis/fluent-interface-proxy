@@ -11,6 +11,9 @@ public interface PersonBuilder extends Builder<Person> {
     @Sets(property = "name")
     PersonBuilder named(String name);
 
+    @Sets(property = "name")
+    PersonBuilder unnamed();
+
     PersonBuilder withName(String name);
 
     @Sets(property = "age")
@@ -21,6 +24,9 @@ public interface PersonBuilder extends Builder<Person> {
     PersonBuilder forAge(int age);
 
     PersonBuilder withAge(String age);
+
+    @Sets(property = "age")
+    PersonBuilder notYetBorn();
 
     PersonBuilder withPartner(PersonBuilder diane);
 

@@ -83,9 +83,8 @@ class PropertySetterFactory {
         if (source == null || source.isEmpty()) {
             return source;
         }
-        if (source.length() == 1) {
-            return source.toLowerCase();
-        }
-        return source.substring(0, 1).toLowerCase() + source.substring(1);
+        char c[] = source.toCharArray();
+        c[0] = Character.toLowerCase(c[0]);
+        return new String(c);
     }
 }

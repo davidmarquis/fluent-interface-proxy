@@ -75,6 +75,33 @@ The dynamic implementation is in fact a Proxy that intercepts all calls to your 
 
 All you need to make sure is that you follow a few conventions when designing your builder interface. Keep reading!
 
+## Usage
+
+## Compatibility
+
+Starting from version 2, this library is **only compatible with Java 8**.
+Version 1.3.2 was the last version that was compatible with pre Java 8 environments.
+
+### Maven dependency
+
+The project is published to Maven Central. To use it in your Maven project, add this dependency to your `pom.xml`:
+
+``` xml
+<dependency>
+    <groupId>com.github.davidmarquis</groupId>
+    <artifactId>fluent-interface-proxy</artifactId>
+    <version>2.0.0</version>
+</dependency>
+```
+
+### Building from sources
+
+You can build from sources using Maven by running:
+
+```
+mvn clean package
+```
+
 ## Features
 
  * Supports any type of property by simply copying the value passed in the builder to the bean's property.
@@ -238,30 +265,3 @@ There are certain limitations however:
 ## Other documentation
 
 Have a look at the tests defined in the `test` folder to see some sample usages of the dynamic builder.
-
-## Usage
-
-## Compatibility
-
-Starting from version 2, this library is **only compatible with Java 8**.
-Version 1.3.2 was the last version that was compatible with pre Java 8 environments.
-
-### Maven dependency
-
-The project is published to Maven Central. To use it in your Maven project, add this dependency to your `pom.xml`:
-
-``` xml
-<dependency>
-    <groupId>com.github.davidmarquis</groupId>
-    <artifactId>fluent-interface-proxy</artifactId>
-    <version>2.0.0</version>
-</dependency>
-```
-
-### Building from sources
-
-You can build from sources using Maven by running:
-
-```
-mvn clean package
-```

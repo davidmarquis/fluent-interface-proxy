@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 
 /**
  * Strategy that sets the target bean's attributes directly using the Reflection API (without going through the setters).
+ * It automatically goes up the class hierarchy to find fields in inherited classes as well.
  */
 public class FieldPropertyAccessStrategy implements PropertyAccessStrategy {
 
@@ -41,7 +42,7 @@ public class FieldPropertyAccessStrategy implements PropertyAccessStrategy {
         }
     }
 
-    private Field getFieldFromClass(Class<?> clazz, String fieldName) {
+    protected Field getFieldFromClass(Class<?> clazz, String fieldName) {
         try {
             return clazz.getDeclaredField(fieldName);
         } catch (NoSuchFieldException e) {
@@ -49,7 +50,7 @@ public class FieldPropertyAccessStrategy implements PropertyAccessStrategy {
         }
     }
 
-    private Field findFieldFromAncestors(Class<?> clazz, String fieldName) {
+    protected Field findFieldFromAncestors(Class<?> clazz, String fieldName) {
         Class<?> parent = clazz.getSuperclass();
 
         if (parent == Object.class) {

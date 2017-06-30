@@ -107,7 +107,7 @@ mvn clean package
  * Supports any type of property by simply copying the value passed in the builder to the bean's property.
  * Supports varargs arguments in builders that can be directly copied to an array property on the target bean, or transformed as any Collection.
  * Supports setting bean values using both public setters and using private fields directly.
- * Supports non-standard property-setting methods **NEW**
+ * Supports non-standard property-setting methods
  * Supports using non-empty constructors on your beans
  * Whenever a Builder is encountered in your Builder interface's methods, this builder will be asked to build the object prior to setting the target bean's property value.
 

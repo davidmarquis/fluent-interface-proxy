@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 /**
  * This is the default conversion function that is applied to setter arguments in builders when not specified with
- * `@Sets(using=Class)` annotation. It coerces the input value to sensitive values.
+ * `@Sets(using=Class)` annotation. It attempts to coerce the input value to sensitive values on a best effort basis.
  */
 public class CoerceValueConverter implements Function {
 

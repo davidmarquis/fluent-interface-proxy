@@ -19,6 +19,18 @@ public class BuilderWithAnnotationsTest {
     }
 
     @Test
+    public void testAlwaysUsesLastConstructsInvocationParameterToInstantiateObject() {
+
+        Person built = aPerson()
+                .with("name", 16)
+                .with("last name", 99)
+                .build();
+
+        assertThat(built.getName(), is("last name"));
+        assertThat(built.getAge(), is(99));
+    }
+
+    @Test
     public void testCanUseConverterFromSetsAnnotatedMethod() {
 
         Person built = aPerson().withAge("16").build();

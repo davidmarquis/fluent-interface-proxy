@@ -23,6 +23,15 @@ public class Person {
         this.partner = partner;
     }
 
+    public Person(List<Person> friends) {
+        this.friends = friends;
+    }
+
+    public Person(String name, List<Person> friends) {
+        this.name = name;
+        this.friends = friends;
+    }
+
     public Person(String name, int age) {
         this.name = name;
         this.age = age;

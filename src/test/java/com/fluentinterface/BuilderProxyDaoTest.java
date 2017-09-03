@@ -113,6 +113,6 @@ public class BuilderProxyDaoTest {
     @Test(expected = IllegalStateException.class)
     public void shouldFailWhenBuilderUsesAnUnknownProperty() {
 
-        aCustomer().withAnUnknownProperty("fails").build();
+        aCustomer().withAnUnknownProperty("a value").build();
     }
 }

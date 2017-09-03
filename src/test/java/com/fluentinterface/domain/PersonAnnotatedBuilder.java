@@ -14,16 +14,22 @@ public interface PersonAnnotatedBuilder extends Builder<Person> {
     @Constructs
     PersonAnnotatedBuilder with(String name, int age);
 
+    @Constructs
+    PersonAnnotatedBuilder havingNameAndFriends(String name, PersonAnnotatedBuilder... friends);
+
+    @Constructs
+    PersonAnnotatedBuilder havingFriends(PersonAnnotatedBuilder... friends);
+
     @Sets(via = StringToInteger.class)
     PersonAnnotatedBuilder withAge(String age);
+
+    static PersonAnnotatedBuilder aPerson() {
+        return ReflectionBuilder.implementationFor(PersonAnnotatedBuilder.class).create();
+    }
 
     class StringToInteger implements Function<String, Integer> {
         public Integer apply(String s) {
             return valueOf(s);
         }
-    }
-
-    static PersonAnnotatedBuilder aPerson() {
-        return ReflectionBuilder.implementationFor(PersonAnnotatedBuilder.class).create();
     }
 }

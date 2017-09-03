@@ -1,19 +1,20 @@
 package com.fluentinterface.proxy.impl;
 
+import com.fluentinterface.proxy.BuilderState;
 import com.fluentinterface.proxy.Instantiator;
 
 /**
  * Instantiates an object using its default empty constructor.
  */
-public class EmptyConstructor implements Instantiator {
-    private Class targetClass;
+public class EmptyConstructor<T> implements Instantiator<T> {
+    private Class<T> targetClass;
 
-    public EmptyConstructor(Class targetClass) {
+    public EmptyConstructor(Class<T> targetClass) {
         this.targetClass = targetClass;
     }
 
     @Override
-    public Object instantiate() throws InstantiationException {
+    public T instantiate(BuilderState state) throws InstantiationException {
         try {
             return targetClass.newInstance();
         } catch (IllegalAccessException e) {

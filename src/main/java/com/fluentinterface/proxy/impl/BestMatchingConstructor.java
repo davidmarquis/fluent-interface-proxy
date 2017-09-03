@@ -1,11 +1,13 @@
 package com.fluentinterface.proxy.impl;
 
+import com.fluentinterface.proxy.BuilderState;
 import com.fluentinterface.proxy.Instantiator;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import static com.fluentinterface.utils.TypeConversionUtils.translateFromPrimitive;
@@ -13,22 +15,25 @@ import static com.fluentinterface.utils.TypeConversionUtils.translateFromPrimiti
 /**
  * Instantiates objects by finding a constructor on the target Class matching a given set of parameters.
  */
-public class BestMatchingConstructor implements Instantiator {
+public class BestMatchingConstructor<T> implements Instantiator<T> {
 
-    private Class builtClass;
+    private Class<T> builtClass;
     private Object[] params;
 
-    public BestMatchingConstructor(Class builtClass, Object[] params) {
+    public BestMatchingConstructor(Class<T> builtClass, Object[] params) {
         this.builtClass = builtClass;
         this.params = params;
     }
 
-    @Override
-    public Object instantiate() throws InstantiationException {
+    public T instantiate(BuilderState state) throws InstantiationException {
         try {
-            Constructor<?> constructor = findMatchingConstructor(params);
+            Constructor<T> constructor = findMatchingConstructor(params);
             if (!constructor.isAccessible()) {
                 constructor.setAccessible(true);
+            }
+            for (int i = 0; i < params.length; i++) {
+                Class<?> targetType = constructor.getParameterTypes()[i];
+                params[i] = state.coerce(params[i], targetType);
             }
             return constructor.newInstance(params);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
@@ -37,7 +42,7 @@ public class BestMatchingConstructor implements Instantiator {
     }
 
     @SuppressWarnings("unchecked")
-    private Constructor findMatchingConstructor(Object[] params) throws NoSuchMethodException {
+    private Constructor<T> findMatchingConstructor(Object[] params) throws NoSuchMethodException {
         if (params == null || params.length == 0) {
             // use default (empty) constructor
             return builtClass.getDeclaredConstructor();
@@ -45,7 +50,7 @@ public class BestMatchingConstructor implements Instantiator {
 
         Class<?>[] paramTypes = extractTypesFromValues(params);
 
-        List<Constructor<?>> candidates = findCandidateConstructors(paramTypes);
+        List<Constructor<T>> candidates = findCandidateConstructors(paramTypes);
 
         if (candidates.isEmpty()) {
             throw new IllegalArgumentException(String.format(
@@ -70,11 +75,12 @@ public class BestMatchingConstructor implements Instantiator {
         return paramTypes;
     }
 
-    private List<Constructor<?>> findCandidateConstructors(Class<?>[] paramTypes) {
-        Constructor<?>[] allConstructors = builtClass.getDeclaredConstructors();
-        List<Constructor<?>> candidates = new ArrayList<>();
+    @SuppressWarnings("unchecked")
+    private List<Constructor<T>> findCandidateConstructors(Class<?>[] paramTypes) {
+        Constructor<T>[] allConstructors = (Constructor<T>[]) builtClass.getDeclaredConstructors();
+        List<Constructor<T>> candidates = new ArrayList<>();
 
-        for (Constructor<?> constructor : allConstructors) {
+        for (Constructor<T> constructor : allConstructors) {
 
             Class<?>[] constructorParamTypes = constructor.getParameterTypes();
             if (constructorParamTypes.length != paramTypes.length) {
@@ -104,6 +110,10 @@ public class BestMatchingConstructor implements Instantiator {
 
                 Class<?> inputParamType = translateFromPrimitive(paramType);
                 Class<?> constructorParamType = translateFromPrimitive(constructorParamTypes[i]);
+
+                if (inputParamType.isArray() && Collection.class.isAssignableFrom(constructorParamType)) {
+                    continue;
+                }
 
                 if (!inputParamType.isAssignableFrom(constructorParamType)) {
                     matches = false;

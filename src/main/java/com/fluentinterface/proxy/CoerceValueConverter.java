@@ -15,13 +15,16 @@ public class CoerceValueConverter implements Function {
     private Class targetType;
     private final Function<Object, Object> next;
 
-    CoerceValueConverter(Class targetType, Function<Object, Object> next) {
+    public CoerceValueConverter(Class targetType, Function<Object, Object> next) {
         this.targetType = targetType;
         this.next = next;
     }
 
     public Object apply(Object value) {
-
+        if (targetType == null) {
+            return value;
+        }
+        
         try {
             if (value != null) {
                 Collection<Object> valueAsCollection = convertToCollectionIfMultiValued(value);

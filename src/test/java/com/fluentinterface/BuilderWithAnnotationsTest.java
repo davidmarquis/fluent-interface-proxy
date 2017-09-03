@@ -4,7 +4,7 @@ import com.fluentinterface.domain.Person;
 import org.junit.Test;
 
 import static com.fluentinterface.domain.PersonAnnotatedBuilder.aPerson;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 public class BuilderWithAnnotationsTest {
@@ -12,29 +12,58 @@ public class BuilderWithAnnotationsTest {
     @Test
     public void testCanUseConstructorFromAnnotatedMethod() {
 
-        Person built = aPerson().with("name", 16).build();
+        Person person = aPerson().with("name", 16).build();
 
-        assertThat(built.getName(), is("name"));
-        assertThat(built.getAge(), is(16));
+        assertThat(person.getName(), is("name"));
+        assertThat(person.getAge(), is(16));
     }
 
     @Test
     public void testAlwaysUsesLastConstructsInvocationParameterToInstantiateObject() {
 
-        Person built = aPerson()
+        Person person = aPerson()
                 .with("name", 16)
                 .with("last name", 99)
                 .build();
 
-        assertThat(built.getName(), is("last name"));
-        assertThat(built.getAge(), is(99));
+        assertThat(person.getName(), is("last name"));
+        assertThat(person.getAge(), is(99));
     }
 
     @Test
     public void testCanUseConverterFromSetsAnnotatedMethod() {
 
-        Person built = aPerson().withAge("16").build();
+        Person person = aPerson().withAge("16").build();
 
-        assertThat(built.getAge(), is(16));
+        assertThat(person.getAge(), is(16));
+    }
+
+    @Test
+    public void testCanUseBuilderVarargsInConstructor() {
+
+        Person person = aPerson().havingFriends(
+                aPerson().with("John", 24),
+                aPerson().with("Nancy", 32)
+        ).build();
+
+        assertThat(person.getFriends(), contains(
+                hasProperty("name", is("John")),
+                hasProperty("name", is("Nancy"))
+        ));
+    }
+
+    @Test
+    public void testCanUsePropertiesCombinedWithVarargsInConstructor() {
+
+        Person person = aPerson().havingNameAndFriends("George",
+                aPerson().with("John", 24),
+                aPerson().with("Nancy", 32)
+        ).build();
+
+        assertThat(person.getName(), is("George"));
+        assertThat(person.getFriends(), contains(
+                hasProperty("name", is("John")),
+                hasProperty("name", is("Nancy"))
+        ));
     }
 }

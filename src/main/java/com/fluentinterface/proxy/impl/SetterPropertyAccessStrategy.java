@@ -30,7 +30,14 @@ public class SetterPropertyAccessStrategy implements PropertyAccessStrategy {
         return propertyDescriptor != null ? propertyDescriptor.getPropertyType() : null;
     }
 
-    public void setPropertyValue(Object target, String property, Object value) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        PropertyUtils.setProperty(target, property, value);
+    public void setPropertyValue(Object target, String property, Object value) throws IllegalAccessException, InvocationTargetException {
+        try {
+            PropertyUtils.setProperty(target, property, value);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException(String.format(
+                        "Unknown property [%s] for class [%s]",
+                        property, target.getClass())
+                );
+        }
     }
 }

@@ -1,6 +1,6 @@
 package com.fluentinterface.proxy;
 
-public interface Instantiator {
+public interface Instantiator<T> {
 
-    Object instantiate() throws IllegalAccessException, InstantiationException;
+    T instantiate(BuilderState state) throws IllegalAccessException, InstantiationException;
 }

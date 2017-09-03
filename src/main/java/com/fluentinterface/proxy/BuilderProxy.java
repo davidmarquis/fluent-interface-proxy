@@ -13,18 +13,19 @@ import java.util.Map;
 /**
  * A dynamic proxy which will build a bean of the target type upon calls to the implemented builder interface.
  */
-public class BuilderProxy implements InvocationHandler {
+public class BuilderProxy<T> implements InvocationHandler {
 
     private Class proxied;
-    private Class  builtClass;
+    private Class<T>  builtClass;
     private BuilderDelegate builderDelegate;
     private PropertyAccessStrategy propertyAccessStrategy;
 
     private Map<PropertySetter, Object> settersWithValues;
-    private Instantiator instantiator;
+    private Instantiator<T> instantiator;
+    private PropertySetterFactory setterFactory;
 
     public BuilderProxy(Class builderInterface,
-                        Class builtClass,
+                        Class<T> builtClass,
                         BuilderDelegate builderDelegate,
                         PropertyAccessStrategy propertyAccessStrategy) {
 
@@ -34,44 +35,29 @@ public class BuilderProxy implements InvocationHandler {
         this.propertyAccessStrategy = propertyAccessStrategy;
 
         this.settersWithValues = new LinkedHashMap<>();
-        this.instantiator = new EmptyConstructor(builtClass);
+        this.instantiator = new EmptyConstructor<>(builtClass);
+        this.setterFactory = new PropertySetterFactory(propertyAccessStrategy, builtClass, builderDelegate);
     }
 
     public Object invoke(Object target, Method method, Object[] params) throws Throwable {
-
-        boolean isBuildMethod = isBuildMethod(method);
-        boolean isConstructingMethod = isConstructingMethod(method);
-
-        if (isConstructingMethod || isBuildMethod) {
+        if (isConstructingMethod(method)) {
+            instantiator = new BestMatchingConstructor<>(builtClass, params);
+            return target;
+        }
+        
+        if (isBuildMethod(method)) {
             params = extractVarArgsIfNeeded(params);
             if (params.length > 0) {
                 buildIfBuilderInstances(params);
-                instantiator = new BestMatchingConstructor(builtClass, params);
+                instantiator = new BestMatchingConstructor<>(builtClass, params);
             }
-        }
-
-        if (isConstructingMethod) {
-            return target;
-        }
-
-        if (isBuildMethod) {
             return createInstanceFromProperties();
         }
 
-        boolean isFluentSetterMethod = isFluentSetter(method);
-
-        if (isFluentSetterMethod) {
-            PropertySetterFactory factory = new PropertySetterFactory(propertyAccessStrategy, builtClass, builderDelegate);
-            PropertySetter setter = factory.createSetterFor(method);
+        if (isFluentSetter(method)) {
+            PropertySetter setter = setterFactory.createSetterFor(method);
             Object valueForProperty = (params == null || params.length == 0)
                     ? null : params[0];
-
-            if (!hasProperty(builtClass, setter.getPropertyName())) {
-                throw new IllegalStateException(String.format(
-                        "Method [%s] on [%s] corresponds to unknown property [%s] on built class [%s]",
-                        method.getName(), proxied, setter.getPropertyName(), builtClass)
-                );
-            }
 
             settersWithValues.put(setter, valueForProperty);
 
@@ -81,25 +67,8 @@ public class BuilderProxy implements InvocationHandler {
         throw new IllegalStateException("Unrecognized builder method invocation: " + method);
     }
 
-    private Object[] extractVarArgsIfNeeded(Object[] params) {
-        if (params != null
-                && params.length == 1
-                && params[params.length - 1].getClass().isArray()) {
-            return (Object[]) params[params.length - 1];
-        }
-        return params;
-    }
-
-    private boolean hasProperty(Class<?> builtClass, String propertyName) {
-        return propertyAccessStrategy.hasProperty(builtClass, propertyName);
-    }
-
     private Object createInstanceFromProperties() throws Exception {
-        if (instantiator == null) {
-            throw new IllegalStateException("No instantiator set for builder");
-        }
-
-        Object instance = instantiator.instantiate();
+        Object instance = instantiator.instantiate(new State());
         PropertyTarget target = this.propertyAccessStrategy.targetFor(instance);
 
         for (Map.Entry<PropertySetter, Object> entry : settersWithValues.entrySet()) {
@@ -138,5 +107,27 @@ public class BuilderProxy implements InvocationHandler {
             return builderDelegate.isBuildMethod(method);
         }
         return method.getReturnType() == Object.class;
+    }
+
+    private Object[] extractVarArgsIfNeeded(Object[] params) {
+        if (params != null
+                && params.length == 1
+                && params[params.length - 1].getClass().isArray()) {
+            return (Object[]) params[params.length - 1];
+        }
+        return params;
+    }
+
+    private class State implements BuilderState {
+
+        private BuildWithBuilderConverter builderConverter;
+
+        State() {
+            builderConverter = new BuildWithBuilderConverter(builderDelegate);
+        }
+
+        public Object coerce(Object value, Class<?> targetType) {
+            return new CoerceValueConverter(targetType, builderConverter).apply(value);
+        }
     }
 }

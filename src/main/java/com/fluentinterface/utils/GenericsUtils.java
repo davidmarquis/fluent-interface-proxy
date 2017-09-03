@@ -5,8 +5,6 @@ import java.lang.reflect.Type;
 
 public class GenericsUtils {
 
-    private GenericsUtils() {}
-
     /**
      * Finds the generic type declared on a single interface implemented by the provided class.
      * If the generic type is itself a generic type (ex: `SomeType<SomeOtherType<T>>`,

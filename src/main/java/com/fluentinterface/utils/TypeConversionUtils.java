@@ -1,9 +1,6 @@
 package com.fluentinterface.utils;
 
 public class TypeConversionUtils {
-
-    private TypeConversionUtils() {}
-
     /**
      * From a primitive type class, tries to return the corresponding wrapper class.
      * @param paramType a primitive type (ex: int, short, float, etc.) to convert

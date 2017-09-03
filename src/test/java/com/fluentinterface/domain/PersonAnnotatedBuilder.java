@@ -12,7 +12,10 @@ import static java.lang.Integer.valueOf;
 public interface PersonAnnotatedBuilder extends Builder<Person> {
 
     @Constructs
-    PersonAnnotatedBuilder with(String name, int age);
+    PersonAnnotatedBuilder of(String name, int age);
+
+    @Constructs
+    PersonAnnotatedBuilder of(String name, int age, PersonAnnotatedBuilder partner);
 
     @Constructs
     PersonAnnotatedBuilder havingNameAndFriends(String name, PersonAnnotatedBuilder... friends);

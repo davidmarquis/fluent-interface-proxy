@@ -141,7 +141,7 @@ ReflectionBuilder.implementationFor(YourBean.class)
         .create();
 ```
 
-Have a look at the `BuilderDelegate` interface, as well as the default implementation of this interface in `ReflectionBuilder` for more details on what to provide in your implementation.
+Have a look at the `BuilderDelegate` interface, as well as the default implementation of this interface `DefaultBuilderDelegate` for more details on what to provide in your own implementation. The abstract base class `AbstractBuilderDelegate` provides an quick and easy starting point to plug your own builder interfaces into the library.
 
 
 ## Choosing between setters or private fields

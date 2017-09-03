@@ -30,6 +30,14 @@ public interface BuilderDelegate<B> {
     Class<?> getClassBuiltBy(Class<?> builderInterface);
 
     /**
+     * Implementation should determine which type of object the provided Builder builds.
+     * Typically this would be determined via the Reflection API.
+     * @param builder builder instance to inspect.
+     * @return the type of object that the Builder builds.
+     */
+    Class<?> getClassBuiltBy(Object builder);
+
+    /**
      * Implementation has to call the right method on the target builder in order to create an instance of
      * the object being built.
      * @param builder the builder which is being asked to build an object.

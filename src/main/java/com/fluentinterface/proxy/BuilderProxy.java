@@ -44,7 +44,7 @@ public class BuilderProxy<T> implements InvocationHandler {
 
     public Object invoke(Object target, Method method, Object[] params) throws Throwable {
         if (isConstructingMethod(method)) {
-            instantiator = new BestMatchingConstructor<>(builtClass, params);
+            instantiator = new BestMatchingConstructor<>(builtClass, builderDelegate, params);
             return target;
         }
         
@@ -52,7 +52,7 @@ public class BuilderProxy<T> implements InvocationHandler {
             params = extractVarArgsIfNeeded(params);
             if (params.length > 0) {
                 buildIfBuilderInstances(params);
-                instantiator = new BestMatchingConstructor<>(builtClass, params);
+                instantiator = new BestMatchingConstructor<>(builtClass, builderDelegate, params);
             }
             return createInstanceFromProperties();
         }

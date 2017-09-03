@@ -1,5 +1,6 @@
 package com.fluentinterface.proxy.impl;
 
+import com.fluentinterface.proxy.BuilderDelegate;
 import com.fluentinterface.proxy.BuilderState;
 import com.fluentinterface.proxy.Instantiator;
 
@@ -18,10 +19,12 @@ import static com.fluentinterface.utils.TypeConversionUtils.translateFromPrimiti
 public class BestMatchingConstructor<T> implements Instantiator<T> {
 
     private Class<T> builtClass;
+    private BuilderDelegate<?> builderDelegate;
     private Object[] params;
 
-    public BestMatchingConstructor(Class<T> builtClass, Object[] params) {
+    public BestMatchingConstructor(Class<T> builtClass, BuilderDelegate<?> builderDelegate, Object[] params) {
         this.builtClass = builtClass;
+        this.builderDelegate = builderDelegate;
         this.params = params;
     }
 
@@ -49,7 +52,6 @@ public class BestMatchingConstructor<T> implements Instantiator<T> {
         }
 
         Class<?>[] paramTypes = extractTypesFromValues(params);
-
         List<Constructor<T>> candidates = findCandidateConstructors(paramTypes);
 
         if (candidates.isEmpty()) {
@@ -70,7 +72,11 @@ public class BestMatchingConstructor<T> implements Instantiator<T> {
         for (int i = 0; i < params.length; i++) {
             Object param = params[i];
 
-            paramTypes[i] = (param == null) ? null : param.getClass();
+            if (builderDelegate.isBuilderInstance(param)) {
+                paramTypes[i] = builderDelegate.getClassBuiltBy(param);
+            } else {
+                paramTypes[i] = (param == null) ? null : param.getClass();
+            }
         }
         return paramTypes;
     }

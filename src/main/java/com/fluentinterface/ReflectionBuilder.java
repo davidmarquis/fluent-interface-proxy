@@ -5,17 +5,16 @@ import com.fluentinterface.proxy.BuilderDelegate;
 import com.fluentinterface.proxy.BuilderProxy;
 import com.fluentinterface.proxy.Instantiator;
 import com.fluentinterface.proxy.PropertyAccessStrategy;
+import com.fluentinterface.proxy.impl.DefaultBuilderDelegate;
 import com.fluentinterface.proxy.impl.FieldPropertyAccessStrategy;
 import com.fluentinterface.proxy.impl.SetterPropertyAccessStrategy;
-import com.fluentinterface.utils.GenericsUtils;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 public class ReflectionBuilder<B> {
 
-    private static BuilderDelegate defaultBuilderDelegate = new InternalBuilderAsSuperClassDelegate();
+    private static BuilderDelegate defaultBuilderDelegate = new DefaultBuilderDelegate();
 
     private BuilderDelegate<? super B> builderDelegate;
     private Class<B> builderInterface;
@@ -97,35 +96,4 @@ public class ReflectionBuilder<B> {
                 handler);
     }
 
-    private static class InternalBuilderAsSuperClassDelegate implements BuilderDelegate<Builder> {
-        private static final String BUILD_METHOD_NAME = "build";
-        private Method buildMethod;
-
-        InternalBuilderAsSuperClassDelegate() {
-            try {
-                this.buildMethod = Builder.class.getDeclaredMethod(BUILD_METHOD_NAME, Object[].class);
-            } catch (NoSuchMethodException e) {
-                throw new IllegalStateException(
-                        String.format("Could not find [%s] method on [%s] class.", BUILD_METHOD_NAME, Builder.class),
-                        e
-                );
-            }
-        }
-
-        public Class<?> getClassBuiltBy(Class<?> builderInterface) {
-            return GenericsUtils.getDeclaredGenericType(builderInterface, Builder.class);
-        }
-
-        public Object build(Builder builder) {
-            return builder.build();
-        }
-
-        public boolean isBuilderInstance(Object value) {
-            return value instanceof Builder;
-        }
-
-        public boolean isBuildMethod(Method method) {
-            return method.equals(buildMethod);
-        }
-    }
 }

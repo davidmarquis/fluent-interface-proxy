@@ -12,7 +12,7 @@ public class BuilderWithAnnotationsTest {
     @Test
     public void testCanUseConstructorFromAnnotatedMethod() {
 
-        Person person = aPerson().with("name", 16).build();
+        Person person = aPerson().of("name", 16).build();
 
         assertThat(person.getName(), is("name"));
         assertThat(person.getAge(), is(16));
@@ -22,8 +22,8 @@ public class BuilderWithAnnotationsTest {
     public void testAlwaysUsesLastConstructsInvocationParameterToInstantiateObject() {
 
         Person person = aPerson()
-                .with("name", 16)
-                .with("last name", 99)
+                .of("name", 16)
+                .of("last name", 99)
                 .build();
 
         assertThat(person.getName(), is("last name"));
@@ -39,11 +39,24 @@ public class BuilderWithAnnotationsTest {
     }
 
     @Test
+    public void testCanUseBuilderParameterInConstructor() {
+        Person person = aPerson().of(
+                "Sylvia",
+                27,
+                aPerson().of("John", 24)
+        ).build();
+
+        assertThat(person.getName(), is("Sylvia"));
+        assertThat(person.getAge(), is(27));
+        assertThat(person.getPartner(), hasProperty("name", is("John")));
+    }
+
+    @Test
     public void testCanUseBuilderVarargsInConstructor() {
 
         Person person = aPerson().havingFriends(
-                aPerson().with("John", 24),
-                aPerson().with("Nancy", 32)
+                aPerson().of("John", 24),
+                aPerson().of("Nancy", 32)
         ).build();
 
         assertThat(person.getFriends(), contains(
@@ -56,8 +69,8 @@ public class BuilderWithAnnotationsTest {
     public void testCanUsePropertiesCombinedWithVarargsInConstructor() {
 
         Person person = aPerson().havingNameAndFriends("George",
-                aPerson().with("John", 24),
-                aPerson().with("Nancy", 32)
+                aPerson().of("John", 24),
+                aPerson().of("Nancy", 32)
         ).build();
 
         assertThat(person.getName(), is("George"));

@@ -223,10 +223,10 @@ public class Person {
 }
 ```
 
-Since version 1.2.0, the library supports these non-default constructors using two different mechanisms:
+The library supports these non-default constructors using three different mechanisms:
 
 
-### Option 1: `@Constructs` annotation on builder methods
+### Option 1: `@Constructs` annotation on builder methods (since 1.2.0)
 
 ```java
 public interface PersonBuilder extends Builder<Person> {
@@ -236,10 +236,10 @@ public interface PersonBuilder extends Builder<Person> {
 }
 ```
 
-Any method annotated with `@Constructs` will end up calling the corresponding constructor on the built object.
+Any method annotated with `@Constructs` will end up calling the corresponding constructor (if found) on the built object.
 
 
-### Option 2: Varargs in `build` method
+### Option 2: Varargs in `build` method (since 1.2.0)
 
 Using the varargs argument constructor in the provided `Builder` interface:
 
@@ -260,6 +260,29 @@ There are certain limitations however:
 
  * Nulls have the effect of being considered as wildcards when the library tries to find a matching constructor. If many constructors match because of that, an error will be thrown because the library cannot know for sure which constructor you intended to use.
  * When no constructor match the signature you provided to either the `build(Object...)` method or the `@Constructs` annotated method, an error will also be thrown.
+
+### Option 3: Using a custom `Instantiator` when configuring the builder (since 2.1.0)
+
+If the above mechanisms do not fit your need, you can take full control of the instantiation process by providing a custom `Instantiator` implementation when creating your reflection builder:
+
+``` java
+PersonBuilder aPerson() {
+    return ReflectionBuilder.implementationFor(PersonBuilder.class)
+        .usingInstantiator((BuilderState state) -> {
+            return new Person(
+                state.consume("name", String.class).orElseThrow(() -> new IllegalStateException("Name is required")),
+                state.consume("spouse", Person.class).orElse(null)
+            );
+        })
+        .create();
+}
+```
+
+The `Instantiator` interface has a single method `instantiate(BuilderState)` whose sole responsibility is to create the target object using the right constructor and using the passed `BuilderState` instance to get values for each constructor parameters.
+
+If you don't want the properties used during the instantiation process to be used later on when setting properties on the object, it is important that the `consume()` method be used to remove the property from the state after usage.
+
+If on the other hand, you want the builder to continue to consider those properties after instantiation, use the `peek()` method instead.
 
 
 ## Other documentation

@@ -7,8 +7,10 @@ import com.fluentinterface.proxy.impl.EmptyConstructor;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A dynamic proxy which will build a bean of the target type upon calls to the implemented builder interface.
@@ -27,7 +29,8 @@ public class BuilderProxy<T> implements InvocationHandler {
     public BuilderProxy(Class builderInterface,
                         Class<T> builtClass,
                         BuilderDelegate builderDelegate,
-                        PropertyAccessStrategy propertyAccessStrategy) {
+                        PropertyAccessStrategy propertyAccessStrategy,
+                        Instantiator instantiator) {
 
         this.proxied = builderInterface;
         this.builtClass = builtClass;
@@ -35,7 +38,7 @@ public class BuilderProxy<T> implements InvocationHandler {
         this.propertyAccessStrategy = propertyAccessStrategy;
 
         this.settersWithValues = new LinkedHashMap<>();
-        this.instantiator = new EmptyConstructor<>(builtClass);
+        this.instantiator = instantiator != null ? instantiator : new EmptyConstructor<>(builtClass);
         this.setterFactory = new PropertySetterFactory(propertyAccessStrategy, builtClass, builderDelegate);
     }
 
@@ -126,8 +129,56 @@ public class BuilderProxy<T> implements InvocationHandler {
             builderConverter = new BuildWithBuilderConverter(builderDelegate);
         }
 
+        public boolean hasValueFor(String... properties) {
+            return Arrays.stream(properties)
+                    .allMatch(prop -> findSetterFor(prop).isPresent());
+        }
+
+        public <P> Optional<P> peek(String property, Class<P> type) {
+            return findSetterFor(property).map(setter -> {
+                Object value = settersWithValues.get(setter);
+                return getValueForTargetProperty(setter, value);
+            });
+        }
+
+        public <P> Optional<P> consume(String property, Class<P> type) {
+            return findSetterFor(property).map(setter -> {
+                Object value = settersWithValues.remove(setter);
+                return getValueForTargetProperty(setter, value);
+            });
+        }
+
         public Object coerce(Object value, Class<?> targetType) {
             return new CoerceValueConverter(targetType, builderConverter).apply(value);
+        }
+
+        private Optional<PropertySetter> findSetterFor(String property) {
+            for (Map.Entry<PropertySetter, Object> setterEntries : settersWithValues.entrySet()) {
+                PropertySetter setter = setterEntries.getKey();
+                if (property.equals(setter.getPropertyName())) {
+                    return Optional.of(setter);
+                }
+            }
+            return Optional.empty();
+        }
+
+        private <P> P getValueForTargetProperty(PropertySetter setter, Object value) {
+            PropertyHolder<P> holder = new PropertyHolder<>();
+            try {
+                setter.apply(holder, value);
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+            return holder.value;
+        }
+
+        private class PropertyHolder<T> implements PropertyTarget {
+            public T value;
+
+            @SuppressWarnings("unchecked")
+            public void setProperty(String property, Object value) throws Exception {
+                this.value = (T) value;
+            }
         }
     }
 }

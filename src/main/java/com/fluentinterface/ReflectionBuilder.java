@@ -3,6 +3,7 @@ package com.fluentinterface;
 import com.fluentinterface.builder.Builder;
 import com.fluentinterface.proxy.BuilderDelegate;
 import com.fluentinterface.proxy.BuilderProxy;
+import com.fluentinterface.proxy.Instantiator;
 import com.fluentinterface.proxy.PropertyAccessStrategy;
 import com.fluentinterface.proxy.impl.FieldPropertyAccessStrategy;
 import com.fluentinterface.proxy.impl.SetterPropertyAccessStrategy;
@@ -20,6 +21,7 @@ public class ReflectionBuilder<B> {
     private Class<B> builderInterface;
     private Class<?> builtClass = null;
     private PropertyAccessStrategy propertyAccessStrategy;
+    private Instantiator instantiator;
 
     @SuppressWarnings("unchecked")
     private ReflectionBuilder(Class<B> builderInterface) {
@@ -38,7 +40,7 @@ public class ReflectionBuilder<B> {
     }
 
     public static <T> ReflectionBuilder<T> implementationFor(Class<T> builderInterface) {
-        return new ReflectionBuilder<T>(builderInterface);
+        return new ReflectionBuilder<>(builderInterface);
     }
 
     public ReflectionBuilder<B> builds(Class<?> objectsOfType) {
@@ -58,6 +60,11 @@ public class ReflectionBuilder<B> {
 
     public ReflectionBuilder<B> usingFieldsDirectly() {
         this.propertyAccessStrategy = new FieldPropertyAccessStrategy();
+        return this;
+    }
+
+    public ReflectionBuilder<B> usingInstantiator(Instantiator instantiator) {
+        this.instantiator = instantiator;
         return this;
     }
 
@@ -81,7 +88,8 @@ public class ReflectionBuilder<B> {
 
     @SuppressWarnings("unchecked")
     public B create() {
-        InvocationHandler handler = new BuilderProxy(builderInterface, getBuiltClass(), builderDelegate, propertyAccessStrategy);
+        InvocationHandler handler = new BuilderProxy(builderInterface, getBuiltClass(),
+                builderDelegate, propertyAccessStrategy, instantiator);
 
         return (B) Proxy.newProxyInstance(
                 builderInterface.getClassLoader(),
@@ -93,7 +101,7 @@ public class ReflectionBuilder<B> {
         private static final String BUILD_METHOD_NAME = "build";
         private Method buildMethod;
 
-        public InternalBuilderAsSuperClassDelegate() {
+        InternalBuilderAsSuperClassDelegate() {
             try {
                 this.buildMethod = Builder.class.getDeclaredMethod(BUILD_METHOD_NAME, Object[].class);
             } catch (NoSuchMethodException e) {

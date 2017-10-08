@@ -121,7 +121,7 @@ public class BestMatchingConstructor<T> implements Instantiator<T> {
                     continue;
                 }
 
-                if (!inputParamType.isAssignableFrom(constructorParamType)) {
+                if (!constructorParamType.isAssignableFrom(inputParamType)) {
                     matches = false;
                     break;
                 }

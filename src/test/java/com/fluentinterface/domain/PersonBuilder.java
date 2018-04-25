@@ -52,4 +52,8 @@ public interface PersonBuilder extends Builder<Person> {
 
     /** Queues are supported only for direct assignment (target class property must also be a Queue). */
     PersonBuilder withQueue(Queue queue);
+
+    default PersonBuilder withManyValues(String name, int age) {
+        return withName(name).withAge(age);
+    }
 }

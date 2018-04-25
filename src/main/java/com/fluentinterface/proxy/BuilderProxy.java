@@ -5,6 +5,9 @@ import com.fluentinterface.proxy.impl.BestMatchingConstructor;
 import com.fluentinterface.proxy.impl.BuildWithBuilderConverter;
 import com.fluentinterface.proxy.impl.EmptyConstructor;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -18,7 +21,7 @@ import java.util.Optional;
 public class BuilderProxy<T> implements InvocationHandler {
 
     private Class proxied;
-    private Class<T>  builtClass;
+    private Class<T> builtClass;
     private BuilderDelegate builderDelegate;
     private PropertyAccessStrategy propertyAccessStrategy;
 
@@ -43,11 +46,15 @@ public class BuilderProxy<T> implements InvocationHandler {
     }
 
     public Object invoke(Object target, Method method, Object[] params) throws Throwable {
+        if (method.isDefault()) {
+            return invokeDefaultMethod(target, method, params);
+        }
+
         if (isConstructingMethod(method)) {
             instantiator = new BestMatchingConstructor<>(builtClass, builderDelegate, params);
             return target;
         }
-        
+
         if (isBuildMethod(method)) {
             params = extractVarArgsIfNeeded(params);
             if (params.length > 0) {
@@ -119,6 +126,37 @@ public class BuilderProxy<T> implements InvocationHandler {
             return (Object[]) params[params.length - 1];
         }
         return params;
+    }
+
+    private Object invokeDefaultMethod(Object target, Method method, Object[] params) throws Throwable {
+        try {
+            return invokeDefaultMethodJava8(target, method, params);
+        } catch (IllegalAccessException e) {
+            return invokeDefaultMethodJava9(target, method, params);
+        }
+    }
+
+    private Object invokeDefaultMethodJava8(Object target, Method method, Object[] params) throws Throwable {
+        Class<?> declaringClass = method.getDeclaringClass();
+        Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
+
+        constructor.setAccessible(true);
+
+        return constructor.newInstance(declaringClass, MethodHandles.Lookup.PRIVATE)
+                          .unreflectSpecial(method, declaringClass)
+                          .bindTo(target)
+                          .invokeWithArguments(params);
+    }
+
+    private Object invokeDefaultMethodJava9(Object target, Method method, Object[] params) throws Throwable {
+        return MethodHandles.lookup()
+                            .findSpecial(
+                                    proxied,
+                                    method.getName(),
+                                    MethodType.methodType(method.getReturnType(), method.getParameterTypes()),
+                                    proxied)
+                            .bindTo(target)
+                            .invokeWithArguments(params);
     }
 
     private class State implements BuilderState {

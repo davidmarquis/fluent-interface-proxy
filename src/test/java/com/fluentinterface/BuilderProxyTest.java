@@ -250,6 +250,14 @@ public class BuilderProxyTest {
         assertThat(built.getAge(), is(16));
     }
 
+    @Test
+    public void shouldPassthroughDefaultMethodsDefinedOnBuilderInterface() {
+        Person built = aPerson().withManyValues("John Doe", 18).build();
+
+        assertThat(built.getName(), is("John Doe"));
+        assertThat(built.getAge(), is(18));
+    }
+
     @Test(expected = NumberFormatException.class)
     public void shouldFailWhenConversionToTargetTypeFails() {
         aPerson().withAge("invalid int").build();

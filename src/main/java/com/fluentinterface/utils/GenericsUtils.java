@@ -7,10 +7,11 @@ public class GenericsUtils {
 
     /**
      * Finds the generic type declared on a single interface implemented by the provided class.
-     * If the generic type is itself a generic type (ex: `SomeType<SomeOtherType<T>>`,
+     * If the generic type is itself a generic type (ex: <pre>{@code SomeType<SomeOtherType<T>>}</pre>,
      * the actual raw type will be returned (in the previous example, `SomeOtherType` would be returned).
      *
      * @param clazz the class on which we want to find the generic type.
+     * @param genericInterface the interface we're looking for.
      * @return the actual type declared on the provided generic interface.
      */
     public static Class<?> getDeclaredGenericType(Class<?> clazz, Class<?> genericInterface) {

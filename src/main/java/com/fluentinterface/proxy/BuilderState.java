@@ -25,7 +25,8 @@ public interface BuilderState {
      * If a conversion is required (either implicit conversion or a conversion configured with `@Sets` annotation), that
      * conversion will be performed prior to returning the value.
      * @param property name of the property to fetch value of.
-     * @param type the type of that property.
+     * @param type the property type.
+     * @param <P> the property type.
      * @return the property value, as provided using a previous builder method invocation.
      */
     <P> Optional<P> peek(String property, Class<P> type);
@@ -37,8 +38,9 @@ public interface BuilderState {
      * If a conversion is required (either implicit conversion or a conversion configured with `@Sets` annotation), that
      * conversion will be performed prior to returning the value.
      * @param property name of the property to fetch value of.
-     * @param type the type of that property.
+     * @param type the property type.
+     * @param <P> the property type.
      * @return the property value, as provided using a previous builder method invocation.
      */
-    <T> Optional<T> consume(String property, Class<T> type);
+    <P> Optional<P> consume(String property, Class<P> type);
 }

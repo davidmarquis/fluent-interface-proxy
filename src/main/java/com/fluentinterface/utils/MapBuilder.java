@@ -6,16 +6,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Utility builder to create a map with a fluent API. Because this builder implements the `Builder<>` interface, it can
+ * Utility builder to create a map with a fluent API. Because this builder implements the <pre>{@code Builder<>}</pre> interface, it can
  * be used directly in other builders as parameters, without the need to call `build()`.
  *
  * Direct usage:
- * ```
- * mappingOf("key", 2).and("other", 3).build();
- * ```
+ * <pre>{@code
+ * mappingof("key", 2).and("other", 3).build();
+ * }</pre>
  *
  * Usage within other builders:
- * ```
+ * <pre>{@code
  * class Person {
  *  public Map<String, Integer> details;
  * }
@@ -25,10 +25,10 @@ import java.util.Map;
  * }
  *
  * aPerson().withDetails(mappingOf("playerNumber", 1929).and("attribute", 12993))
- * ```
+ * }</pre>
  *
- * @param <K>
- * @param <V>
+ * @param <K> type for the map's keys
+ * @param <V> type for the map's values
  */
 public class MapBuilder<K, V> implements Builder<Map<K, V>> {
 

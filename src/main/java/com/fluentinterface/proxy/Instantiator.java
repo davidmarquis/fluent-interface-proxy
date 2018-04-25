@@ -8,8 +8,7 @@ public interface Instantiator<T> {
      * builder will automatically set remaining properties on the target object once instantiated.
      * @param state the current state of the builder, as built with builder method invocations.
      * @return the instantiated object
-     * @throws IllegalAccessException
-     * @throws InstantiationException
+     * @throws Exception if anything wrong happens when instantiating the class.
      */
-    T instantiate(BuilderState state) throws IllegalAccessException, InstantiationException;
+    T instantiate(BuilderState state) throws Exception;
 }

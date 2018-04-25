@@ -169,7 +169,7 @@ public class BuilderProxy<T> implements InvocationHandler {
 
         public boolean hasValueFor(String... properties) {
             return Arrays.stream(properties)
-                    .allMatch(prop -> findSetterFor(prop).isPresent());
+                         .allMatch(prop -> findSetterFor(prop).isPresent());
         }
 
         public <P> Optional<P> peek(String property, Class<P> type) {
@@ -210,12 +210,12 @@ public class BuilderProxy<T> implements InvocationHandler {
             return holder.value;
         }
 
-        private class PropertyHolder<T> implements PropertyTarget {
-            public T value;
+        private class PropertyHolder<P> implements PropertyTarget {
+            public P value;
 
             @SuppressWarnings("unchecked")
-            public void setProperty(String property, Object value) throws Exception {
-                this.value = (T) value;
+            public void setProperty(String property, Object value) {
+                this.value = (P) value;
             }
         }
     }

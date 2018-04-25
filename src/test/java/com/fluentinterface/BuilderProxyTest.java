@@ -74,7 +74,6 @@ public class BuilderProxyTest {
 
     @Test
     public void shouldSetPropertyValueString() {
-
         Person built = aPerson()
                 .withName("John Smith")
                 .build();
@@ -84,7 +83,6 @@ public class BuilderProxyTest {
 
     @Test
     public void shouldSetPropertyValuePrimitive() {
-
         Person built = aPerson()
                 .withAge(10)
                 .build();
@@ -94,7 +92,6 @@ public class BuilderProxyTest {
 
     @Test
     public void shouldSetPropertyValueToLastOneWhenCalledMultipleTimes() {
-
         Person built = aPerson()
                 .withAge(10)
                 .withAge(20)
@@ -105,8 +102,6 @@ public class BuilderProxyTest {
 
     @Test
     public void shouldSetPropertyValueArrayToList() {
-
-
         Person built = aPerson()
                 .withFriends(
                         aPerson().withName("John").build(),
@@ -120,7 +115,6 @@ public class BuilderProxyTest {
 
     @Test
     public void shouldSetPropertyValueArrayOfBuildersToCollection() {
-
         Person built = aPerson()
                 .withFriends(
                         aPerson().withName("Joe"),
@@ -134,7 +128,6 @@ public class BuilderProxyTest {
 
     @Test
     public void shouldSetPropertyValueArrayOfBuildersToArray() {
-
         Person built = aPerson()
                 .withParents(
                         aPerson().withName("Mommy"),
@@ -162,7 +155,6 @@ public class BuilderProxyTest {
 
     @Test
     public void shouldSetPropertyValueCollectionToCollection() {
-
         Person built = aPerson()
                 .withParents(asList(
                         aPerson().withName("Mommy").build(),
@@ -176,7 +168,6 @@ public class BuilderProxyTest {
 
     @Test
     public void shouldSetPropertyValueArrayToSet() {
-
         Person built = aPerson()
                 .withSurnames("Bill", "William", "Guillaume")
                 .build();
@@ -189,7 +180,6 @@ public class BuilderProxyTest {
 
     @Test
     public void shouldSetPropertyValueArrayOfPrimitivesToArrayOfPrimitives() {
-
         Person built = aPerson()
                 .withAgesOfMarriages(23, 45)
                 .build();
@@ -199,7 +189,6 @@ public class BuilderProxyTest {
 
     @Test
     public void shouldSetPropertyValueBuilderToObject() {
-
         Person built = aPerson()
                 .withPartner(
                         aPerson().withName("Diane")
@@ -211,7 +200,6 @@ public class BuilderProxyTest {
 
     @Test
     public void shouldCopyCollectionByReferenceWhenCollectionTypeNotSupported() {
-
         ArrayDeque queue = new ArrayDeque();
         Person built = aPerson().withQueue(queue).build();
 
@@ -220,7 +208,6 @@ public class BuilderProxyTest {
 
     @Test
     public void shouldCallSpecificConstructorWhenBuildMethodCalledWithParameters() {
-
         Person person = aPerson().build("Jeremy", 3);
 
         assertThat(person.getName(), is("Jeremy"));
@@ -229,7 +216,6 @@ public class BuilderProxyTest {
 
     @Test
     public void shouldCallSpecificConstructorWhenBuildMethodCalledWithParametersWithNullValue() {
-
         Person person = aPerson().build("Jeremy", 3, null);
 
         assertThat(person.getName(), is("Jeremy"));
@@ -239,7 +225,6 @@ public class BuilderProxyTest {
 
     @Test
     public void shouldUseBuilderWhenPassedInBuildMethodArguments() {
-
         Person person = aPerson().build("Jeremy", 3, aPerson().withName("Suzana"));
 
         assertThat(person.getName(), is("Jeremy"));
@@ -249,7 +234,6 @@ public class BuilderProxyTest {
 
     @Test
     public void shouldSetPropertyUserSetsAnnotation() {
-
         Person built = aPerson()
                 .named("John Smith")
                 .aged(20)
@@ -261,35 +245,28 @@ public class BuilderProxyTest {
 
     @Test
     public void shouldConvertValueToTargetTypeWhenPossible() {
-
         Person built = aPerson().withAge("16").build();
 
         assertThat(built.getAge(), is(16));
     }
 
-    @Test
-    public void shouldAttemptConversionOfInputValueToTargetValueType() {
-
-        Person built = aPerson().withAge("invalid int").build();
-
-        assertThat(built.getAge(), is(0));
+    @Test(expected = NumberFormatException.class)
+    public void shouldFailWhenConversionToTargetTypeFails() {
+        aPerson().withAge("invalid int").build();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailWhenMultipleConstructorsMatchBuildMethodArguments() {
-
         aPerson().build(null, 3);
     }
 
     @Test(expected = IllegalStateException.class)
     public void shouldFailWhenBuilderUsesAnUnknownProperty() {
-
         aPerson().withAnUnknownProperty("fails").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void shouldFailWhenBuilderMethodDoesNotContainPropertyName() {
-
         aPerson().something("fails").build();
     }
 }

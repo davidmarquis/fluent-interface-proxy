@@ -14,7 +14,7 @@ import java.util.List;
 import static com.fluentinterface.utils.TypeConversionUtils.translateFromPrimitive;
 
 /**
- * Instantiates objects by finding a constructor on the target Class matching a given set of parameters.
+ * Instantiates objects by finding a constructor on the target Class that matches the provided set of parameters.
  */
 public class BestMatchingConstructor<T> implements Instantiator<T> {
 
@@ -30,7 +30,7 @@ public class BestMatchingConstructor<T> implements Instantiator<T> {
 
     public T instantiate(BuilderState state) throws InstantiationException {
         try {
-            Constructor<T> constructor = findMatchingConstructor(params);
+            Constructor<T> constructor = findConstructorMatching(params);
             if (!constructor.isAccessible()) {
                 constructor.setAccessible(true);
             }
@@ -45,7 +45,7 @@ public class BestMatchingConstructor<T> implements Instantiator<T> {
     }
 
     @SuppressWarnings("unchecked")
-    private Constructor<T> findMatchingConstructor(Object[] params) throws NoSuchMethodException {
+    private Constructor<T> findConstructorMatching(Object[] params) throws NoSuchMethodException {
         if (params == null || params.length == 0) {
             // use default (empty) constructor
             return builtClass.getDeclaredConstructor();

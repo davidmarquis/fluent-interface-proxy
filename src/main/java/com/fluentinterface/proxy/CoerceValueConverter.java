@@ -1,6 +1,6 @@
 package com.fluentinterface.proxy;
 
-import org.apache.commons.beanutils.ConvertUtils;
+import com.fluentinterface.convert.Converter;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -12,14 +12,17 @@ import java.util.function.Function;
  */
 public class CoerceValueConverter implements Function {
 
+    private final Converter converter;
     private Class targetType;
     private final Function<Object, Object> next;
 
     CoerceValueConverter(Class targetType, Function<Object, Object> next) {
         this.targetType = targetType;
         this.next = next;
+        this.converter = new Converter();
     }
 
+    @SuppressWarnings("unchecked")
     public Object apply(Object value) {
         if (targetType == null) {
             return value;
@@ -36,16 +39,20 @@ public class CoerceValueConverter implements Function {
                     return value;
                 } else {
                     value = next.apply(value);
-                    value = ConvertUtils.convert(value, targetType);
+                    value = convert(value);
                 }
             } else {
-                value = ConvertUtils.convert((Object) null, targetType);
+                value = convert(null);
             }
         } catch (IllegalAccessException | InstantiationException e) {
             throw new RuntimeException(e);
         }
 
         return value;
+    }
+
+    private Object convert(Object value) {
+        return converter.convert(value, targetType);
     }
 
     private Object transformCollectionToTargetTypeIfPossible(Object originalValue, Collection<Object> valueAsCollection,

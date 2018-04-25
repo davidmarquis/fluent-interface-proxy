@@ -1,43 +1,28 @@
 package com.fluentinterface.proxy.impl;
 
+import com.fluentinterface.beans.ObjectWrapper;
+import com.fluentinterface.beans.PropertyNotFoundException;
+import com.fluentinterface.beans.reflect.Bean;
+import com.fluentinterface.beans.reflect.Property;
 import com.fluentinterface.proxy.PropertyAccessStrategy;
-import org.apache.commons.beanutils.PropertyUtils;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
+import java.util.Optional;
 
 /**
  * A strategy that uses public setters to set target bean properties (using Apache BeanUtils PropertyUtils).
  */
 public class SetterPropertyAccessStrategy implements PropertyAccessStrategy {
 
-    private PropertyDescriptor getPropertyDescriptor(Class<?> builtClass, String propertyName) {
-        PropertyDescriptor[] propertyDescriptors = PropertyUtils.getPropertyDescriptors(builtClass);
-        for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
-            if (propertyDescriptor.getName().equals(propertyName)) {
-                return propertyDescriptor;
-            }
-        }
-        return null;
-    }
-
-    public boolean hasProperty(Class<?> builtClass, String propertyName) {
-        return getPropertyDescriptor(builtClass, propertyName) != null;
-    }
-
     public Class getPropertyType(Class<?> targetClass, String property) {
-        PropertyDescriptor propertyDescriptor = getPropertyDescriptor(targetClass, property);
-        return propertyDescriptor != null ? propertyDescriptor.getPropertyType() : null;
+        return Optional.ofNullable(ObjectWrapper.getProperty(Bean.forClass(targetClass), property)).map(Property::getType).orElse(null);
     }
 
-    public void setPropertyValue(Object target, String property, Object value) throws IllegalAccessException, InvocationTargetException {
+    public void setPropertyValue(Object target, String property, Object value) {
         try {
-            PropertyUtils.setProperty(target, property, value);
-        } catch (NoSuchMethodException e) {
-            throw new IllegalStateException(String.format(
-                        "Unknown property [%s] for class [%s]",
-                        property, target.getClass())
-                );
+            new ObjectWrapper(target).setSimpleValue(property, value);
+        } catch (PropertyNotFoundException e) {
+            throw new IllegalStateException(e);
         }
     }
+
 }

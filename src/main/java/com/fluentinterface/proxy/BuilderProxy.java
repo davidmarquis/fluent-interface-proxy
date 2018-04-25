@@ -58,7 +58,7 @@ public class BuilderProxy<T> implements InvocationHandler {
         }
 
         if (isFluentSetter(method)) {
-            PropertySetter setter = setterFactory.createSetterFor(method);
+            PropertySetter setter = setterFactory.createPropertySetter(method);
             Object valueForProperty = (params == null || params.length == 0)
                     ? null : params[0];
 

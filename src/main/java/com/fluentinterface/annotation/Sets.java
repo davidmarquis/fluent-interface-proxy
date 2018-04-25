@@ -1,7 +1,5 @@
 package com.fluentinterface.annotation;
 
-import com.fluentinterface.proxy.CoerceValueConverter;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.function.Function;
@@ -24,5 +22,12 @@ public @interface Sets {
     /**
      * @return a custom value conversion function to use when setting the input value on the target bean.
      */
-    Class<? extends Function> via() default CoerceValueConverter.class;
+    Class<? extends Function> via() default NotSet.class;
+
+    class NotSet implements Function {
+        @Override
+        public Object apply(Object o) {
+            throw new IllegalStateException("This is strictly a marker class to support a default value in the Sets annotation.");
+        }
+    }
 }

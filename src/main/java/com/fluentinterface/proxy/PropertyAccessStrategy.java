@@ -2,8 +2,6 @@ package com.fluentinterface.proxy;
 
 public interface PropertyAccessStrategy {
 
-    boolean hasProperty(Class<?> builtClass, String property);
-
     Class getPropertyType(Class<?> targetClass, String property);
 
     void setPropertyValue(Object target, String property, Object value) throws Exception;

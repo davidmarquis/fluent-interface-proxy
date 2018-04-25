@@ -1,0 +1,1 @@
+package com.fluentinterface.domain.examples;public enum CustomerType {	BASIC, SILVER, GOLD}

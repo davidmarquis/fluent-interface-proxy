@@ -24,37 +24,43 @@ class PropertySetterFactory {
         this.builderDelegate = builderDelegate;
     }
 
-    PropertySetter createSetterFor(Method method) {
-        String propertyName = getPropertyName(method);
+    PropertySetter createPropertySetter(Method setterMethod) {
+        String propertyName = getPropertyName(setterMethod);
 
         if (propertyName != null && !propertyName.isEmpty()) {
-            Function valueConverter = getValueConverter(method, propertyName);
+            Function valueConverter = getValueConverter(setterMethod, propertyName);
             return new TransformPropertySetter(propertyName, valueConverter);
         }
 
         throw new IllegalStateException(String.format(
-                "Method [%s] does not seem to represent a setter for a property", method.getName()));
+                "Method [%s] does not seem to represent a setter for a property", setterMethod.getName()));
     }
 
-    private Function getValueConverter(Method method, String propertyName) {
-        Class<? extends Function> valueConverterClass = CoerceValueConverter.class;
+    private Function getValueConverter(Method method, String targetProperty) {
         Sets setsAnnotation = method.getAnnotation(Sets.class);
         if (setsAnnotation != null) {
-            valueConverterClass = setsAnnotation.via();
+            return createConverterFromAnnotation(setsAnnotation, targetProperty);
+        } else {
+            return createDefaultConverter(targetProperty);
         }
+    }
 
-        Function valueConverter;
+    private Function createDefaultConverter(String targetProperty) {
+        Class<?> targetClass = propertyAccessStrategy.getPropertyType(builtClass, targetProperty);
+        return new CoerceValueConverter(targetClass, new BuildWithBuilderConverter(builderDelegate));
+    }
+
+    private Function createConverterFromAnnotation(Sets setsAnnotation, String targetProperty) {
+        Class<? extends Function> valueConverterClass = setsAnnotation.via();
+        if (valueConverterClass.equals(Sets.NotSet.class)) {
+            return createDefaultConverter(targetProperty);
+        }
+        
         try {
-            if (valueConverterClass.isAssignableFrom(CoerceValueConverter.class)) {
-                Class<?> targetClass = propertyAccessStrategy.getPropertyType(builtClass, propertyName);
-                valueConverter = new CoerceValueConverter(targetClass, new BuildWithBuilderConverter(builderDelegate));
-            } else {
-                valueConverter = valueConverterClass.newInstance();
-            }
+            return valueConverterClass.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(String.format("Could not instantiate function class %s", valueConverterClass), e);
         }
-        return valueConverter;
     }
 
     private String getPropertyName(Method method) {

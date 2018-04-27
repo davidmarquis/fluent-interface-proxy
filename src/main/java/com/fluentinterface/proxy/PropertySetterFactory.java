@@ -1,7 +1,7 @@
 package com.fluentinterface.proxy;
 
 import com.fluentinterface.annotation.Sets;
-import com.fluentinterface.proxy.impl.BuildWithBuilderConverter;
+import com.fluentinterface.proxy.impl.BuildWithBuilder;
 import com.fluentinterface.proxy.impl.TransformPropertySetter;
 
 import java.lang.reflect.Method;
@@ -17,8 +17,9 @@ class PropertySetterFactory {
     private BuilderDelegate builderDelegate;
 
     PropertySetterFactory(PropertyAccessStrategy propertyAccessStrategy,
-                                 Class<?> builtClass,
-                                 BuilderDelegate builderDelegate) {
+                          Class<?> builtClass,
+                          BuilderDelegate builderDelegate) {
+
         this.propertyAccessStrategy = propertyAccessStrategy;
         this.builtClass = builtClass;
         this.builderDelegate = builderDelegate;
@@ -47,7 +48,7 @@ class PropertySetterFactory {
 
     private Function createDefaultConverter(String targetProperty) {
         Class<?> targetClass = propertyAccessStrategy.getPropertyType(builtClass, targetProperty);
-        return new CoerceValueConverter(targetClass, new BuildWithBuilderConverter(builderDelegate));
+        return new CoerceValueConverter(targetClass, new BuildWithBuilder(builderDelegate));
     }
 
     private Function createConverterFromAnnotation(Sets setsAnnotation, String targetProperty) {
@@ -55,7 +56,7 @@ class PropertySetterFactory {
         if (valueConverterClass.equals(Sets.NotSet.class)) {
             return createDefaultConverter(targetProperty);
         }
-        
+
         try {
             return valueConverterClass.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {

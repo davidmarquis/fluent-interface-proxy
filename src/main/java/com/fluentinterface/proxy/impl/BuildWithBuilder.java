@@ -4,11 +4,11 @@ import com.fluentinterface.proxy.BuilderDelegate;
 
 import java.util.function.Function;
 
-public class BuildWithBuilderConverter implements Function<Object, Object> {
+public class BuildWithBuilder implements Function<Object, Object> {
 
     private BuilderDelegate builderDelegate;
 
-    public BuildWithBuilderConverter(BuilderDelegate builderDelegate) {
+    public BuildWithBuilder(BuilderDelegate builderDelegate) {
         this.builderDelegate = builderDelegate;
     }
 

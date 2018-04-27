@@ -2,7 +2,7 @@ package com.fluentinterface.proxy;
 
 import com.fluentinterface.annotation.Constructs;
 import com.fluentinterface.proxy.impl.BestMatchingConstructor;
-import com.fluentinterface.proxy.impl.BuildWithBuilderConverter;
+import com.fluentinterface.proxy.impl.BuildWithBuilder;
 import com.fluentinterface.proxy.impl.EmptyConstructor;
 
 import java.lang.invoke.MethodHandles;
@@ -92,7 +92,7 @@ public class BuilderProxy<T> implements InvocationHandler {
     }
 
     private void buildIfBuilderInstances(Object[] params) {
-        BuildWithBuilderConverter builder = new BuildWithBuilderConverter(builderDelegate);
+        BuildWithBuilder builder = new BuildWithBuilder(builderDelegate);
         for (int i = 0; i < params.length; i++) {
             params[i] = builder.apply(params[i]);
         }
@@ -161,10 +161,10 @@ public class BuilderProxy<T> implements InvocationHandler {
 
     private class State implements BuilderState {
 
-        private BuildWithBuilderConverter builderConverter;
+        private BuildWithBuilder builderConverter;
 
         State() {
-            builderConverter = new BuildWithBuilderConverter(builderDelegate);
+            builderConverter = new BuildWithBuilder(builderDelegate);
         }
 
         public boolean hasValueFor(String... properties) {

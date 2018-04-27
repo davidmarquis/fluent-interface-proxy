@@ -4,15 +4,16 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.*;
+import java.util.Date;
 import java.util.List;
 
-import static com.fluentinterface.convert.Conversions.conversions;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 public class ConverterTest {
 
-    private final Converter converter = new Converter();
+    private final Converter converter = new Converter(Conversions.defaults());
 
     @Test
     public void convertsNullsToPrimitives() {
@@ -79,6 +80,29 @@ public class ConverterTest {
     }
 
     @Test
+    public void convertsISODateStringToDates() {
+        assertThat("String->Date", converter.convert("2018-08-12", Date.class),
+                   is(Date.from(LocalDate.of(2018, 8, 12).atStartOfDay(ZoneId.systemDefault()).toInstant())));
+        assertThat("String->LocalDate", converter.convert("2018-08-12", LocalDate.class),
+                   is(LocalDate.of(2018, 8, 12)));
+        assertThat("String->LocalTime", converter.convert("07:54:34", LocalTime.class),
+                   is(LocalTime.of(7, 54, 34)));
+        assertThat("String->LocalDateTime", converter.convert("2018-08-12T07:54:34", LocalDateTime.class),
+                   is(LocalDateTime.of(2018, 8, 12, 7, 54, 34)));
+        assertThat("String->ZonedDateTime", converter.convert("2018-08-12T07:54:34Z[UTC]", ZonedDateTime.class),
+                   is(ZonedDateTime.of(LocalDateTime.of(2018, 8, 12, 7, 54, 34), ZoneId.of("UTC"))));
+        assertThat("String->Instant", converter.convert("2018-08-12T07:54:34Z", Instant.class),
+                   is(Instant.ofEpochSecond(1534060474)));
+    }
+
+    private enum Fruit {apple}
+
+    @Test
+    public void convertsStringToEnum() {
+        assertThat("String->Enum", converter.convert("apple", Fruit.class), is(Fruit.apple));
+    }
+
+    @Test
     public void doesNotConvertWhenObjectIsInstanceOfTargetType() {
         Integer value = 123;
         assertThat("Integer->Number", converter.convert(value, Number.class), sameInstance(value));
@@ -86,8 +110,10 @@ public class ConverterTest {
 
     @Test
     public void usesCustomConvertersFirst() {
-        Converter converter = new Converter(conversions()
-                                                    .add(TypeMatcher.is(Integer.class), TypeMatcher.is(String.class), (v, c) -> "custom"));
+        Converter converter = new Converter(
+                Conversions.empty()
+                           .add(TypeMatcher.is(Integer.class), TypeMatcher.is(String.class), (v, t, c) -> "custom")
+                           .addDefaultConverters());
 
         assertThat("custom conversion", converter.convert(999, String.class), is("custom"));
     }

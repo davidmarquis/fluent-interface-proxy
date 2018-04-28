@@ -79,7 +79,7 @@ All you need to make sure is that you follow a few conventions when designing yo
 
 ## Compatibility
 
-Starting from version 2, this library is **only compatible with Java 8**.
+Starting from version 2, this library is **only compatible with Java 8+**.
 Version 1.3.2 was the last version that was compatible with pre Java 8 environments.
 
 ### Maven dependency
@@ -90,7 +90,7 @@ The project is published to Maven Central. To use it in your Maven project, add 
 <dependency>
     <groupId>com.github.davidmarquis</groupId>
     <artifactId>fluent-interface-proxy</artifactId>
-    <version>2.0.0</version>
+    <version>LATEST</version>
 </dependency>
 ```
 
@@ -105,28 +105,31 @@ mvn clean package
 ## Features
 
  * Supports any type of property by simply copying the value passed in the builder to the bean's property.
- * Supports varargs arguments in builders that can be directly copied to an array property on the target bean, or transformed as any Collection.
+ * Supports varargs arguments in builder methods, which will be be directly copied to an array property on the target bean, or transformed as any Collection.
  * Supports setting bean values using both public setters and using private fields directly.
- * Supports non-standard property-setting methods
- * Supports using non-empty constructors on your beans
+ * Supports custom property-setting methods via the `@Sets` annotation.
+ * Supports using non-empty constructors on your target beans.
+ * Supports transpart conversion between your property-setting method arguments and target properties.
  * Whenever a Builder is encountered in your Builder interface's methods, this builder will be asked to build the object prior to setting the target bean's property value.
 
 ## Tips for designing your builder interfaces
 
  * **Any prefix is supported for property-setting methods**
-    In the example above, `with` and `having` are used, but anything else lower case could be used.
- * **The property names must match between the builder method and the actual bean property**
+    In the example above, `with` and `having` are used, but anything else lower case could be used. The name of the target property is always assumed to start from the first uppercase character in the method name.
+ * **Property names should match between the builder method and the actual bean property**
     For every property-setting method in your builder, there must exist a property that is named exactly the same as what comes after the lower case prefix.
-    Ex: `builder.withSomething` -> `bean.setSomething`
+    Ex: `builder.withSomething -> bean.setSomething`
     For cases when you need to set a different property, use the `@Sets` annotation on the builder method (continue reading for details).
  * **Every property-setting method has to return the builder itself**.
-    We're using the Builder pattern, eh?
+    We're using the Builder pattern, right? It's all about chaining.
  * **For multi-valued properties (arrays or collections), you can use varargs in your interface.**
-    The framework will automatically convert to set the correct value on the target bean (even collections!).
+    The library will automatically convert to set the correct value on the target bean (even collections!).
+ * **Arguments of property-setting methods do not need to match the target property's type**
+    Best-effort conversion is attempted every time the type of your property-setting method argument does not match the target property's type. See the class `Conversions` for details of the conversions supported out-of-the-box.
  * **You may use a `Builder` in place of any bean in your builder methods.**
     The Builder's `build()` method will automatically be called and the resulting bean will be set on the target bean's property.
- * **By default, your builder interface should extend the `Builder<T>` interface provided in the framework.**
-    This interface has a single method: `T build(Object...)`. If extending this interface is too invasive (I understand why it would be in some cases), you can use your own super interface, but you have to provide custom code to 'plug it in' (see below).
+ * **Your builder interface should extend the `Builder<T>` interface provided in the library.**
+    This interface has a single method: `T build(Object...)`. If extending this interface is too invasive (I understand why it would be in some cases), you can use your own super interface, but you have to provide a custom `BuilderDelegate` to help the library understand what it's building (see below).
 
 
 ## Using your own `build` method
@@ -158,10 +161,8 @@ ReflectionBuilder.implementationFor(YourBuilder.class)
 You may also provide your own implementation of the `AttributeAccessStrategy` interface and use it this way:
 
 ``` java
-AttributeAccessStrategy yourStrategy = new YourStrategy();  // implements AttributeAccessStrategy interface
-
 ReflectionBuilder.implementationFor(YourBean.class)
-        .usingAttributeAccessStrategy(yourStrategy)
+        .usingAttributeAccessStrategy(new YourStrategy()) // implements AttributeAccessStrategy interface
         .create();
 ```
 
@@ -198,12 +199,11 @@ public interface PersonBuilder extends Builder<Person> {
 }
 ```
 
-The `Class` passed to the `via` parameter must implement the Java `Function` interface. A new instance of that class will be created every time the property needs to be set and will be called *instead* of the library's default processing.
+The `Class` passed to the `via` parameter must implement the Java `Function` interface. A new instance of that class will be created every time the property needs to be set and will be called *instead* of the library's default processing - which is to try to convert the source value into the destination type on a best effort basis.
 
 ## Using non-empty constructors
 
-Sometimes the beans you are building may have only non-empty constructors available, or you may require the use of a specific constructor
-when using your dynamic builder.
+Sometimes the beans you are building may have only non-empty constructors available, or you may require the use of a specific constructor when using your dynamic builder.
 
 Example bean with a non-default constructor:
 
@@ -248,7 +248,7 @@ PersonBuilder aPerson() {
     return ReflectionBuilder.implementationFor(PersonBuilder.class).create();
 }
 
-Person person = aPerson().build("Jeremy", aPerson().withAge(16) );
+Person person = aPerson().build("Jeremy", aPerson().withAge(16));
 ```
 
 
@@ -278,11 +278,11 @@ PersonBuilder aPerson() {
 }
 ```
 
-The `Instantiator` interface has a single method `instantiate(BuilderState)` whose sole responsibility is to create the target object using the right constructor and using the passed `BuilderState` instance to get values for each constructor parameters.
+The `Instantiator` interface has a single method `instantiate(BuilderState)` whose sole responsibility is to create the target object using the right constructor and using the passed `BuilderState` instance to obtain values for each constructor parameters (as set by previous invocations of property-setting methods).
 
 If you don't want the properties used during the instantiation process to be used later on when setting properties on the object, it is important that the `consume()` method be used to remove the property from the state after usage.
 
-If on the other hand, you want the builder to continue to consider those properties after instantiation, use the `peek()` method instead.
+If on the other hand, you want the builder to continue to consider these properties after instantiation, use the `peek()` method instead.
 
 
 ## Other documentation

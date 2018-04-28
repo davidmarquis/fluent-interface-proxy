@@ -1,4 +1,4 @@
-package com.fluentinterface.proxy.impl;
+package com.fluentinterface.proxy.internal;
 
 import com.fluentinterface.beans.ObjectWrapper;
 import com.fluentinterface.beans.PropertyNotFoundException;

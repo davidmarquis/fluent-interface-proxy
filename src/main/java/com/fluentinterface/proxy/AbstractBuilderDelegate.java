@@ -1,6 +1,5 @@
-package com.fluentinterface.proxy.impl;
+package com.fluentinterface.proxy;
 
-import com.fluentinterface.proxy.BuilderDelegate;
 import com.fluentinterface.utils.GenericsUtils;
 
 import java.lang.reflect.Method;
@@ -21,7 +20,7 @@ public abstract class AbstractBuilderDelegate<B> implements BuilderDelegate<B> {
     }
 
     protected abstract String getBuildMethodName();
-    
+
     protected abstract Class<B> getBuilderClass();
 
     public Class<?> getClassBuiltBy(Class<?> builderInterface) {
@@ -30,11 +29,11 @@ public abstract class AbstractBuilderDelegate<B> implements BuilderDelegate<B> {
 
     public Class<?> getClassBuiltBy(Object builder) {
         return Arrays.stream(builder.getClass().getInterfaces())
-                .filter(clazz -> getBuilderClass().isAssignableFrom(clazz))
-                .map(this::getClassBuiltBy)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException(String.format(
-                        "Could not determine which class builder [%s] builds", builder.getClass())));
+                     .filter(clazz -> getBuilderClass().isAssignableFrom(clazz))
+                     .map(this::getClassBuiltBy)
+                     .findFirst()
+                     .orElseThrow(() -> new IllegalStateException(String.format(
+                             "Could not determine which class builder [%s] builds", builder.getClass())));
     }
 
     public boolean isBuilderInstance(Object value) {

@@ -1,4 +1,4 @@
-package com.fluentinterface.proxy;
+package com.fluentinterface.proxy.internal;
 
 import com.fluentinterface.convert.Converter;
 
@@ -10,7 +10,7 @@ import java.util.function.Function;
  * This is the default conversion function that is applied to setter arguments in builders when not specified with
  * `@Sets(using=Class)` annotation. It attempts to coerce the input value to sensitive values on a best effort basis.
  */
-public class CoerceValueConverter implements Function {
+class CoerceValueConverter implements Function {
 
     private final Converter converter;
     private Class targetType;
@@ -27,7 +27,7 @@ public class CoerceValueConverter implements Function {
         if (targetType == null) {
             return value;
         }
-        
+
         try {
             if (value != null) {
                 Collection<Object> valueAsCollection = convertToCollectionIfMultiValued(value);

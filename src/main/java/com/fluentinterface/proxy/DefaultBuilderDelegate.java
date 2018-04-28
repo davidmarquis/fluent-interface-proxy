@@ -1,7 +1,10 @@
-package com.fluentinterface.proxy.impl;
+package com.fluentinterface.proxy;
 
 import com.fluentinterface.builder.Builder;
 
+/**
+ * Bridges the provided {@link Builder} interface as the builder interface.
+ */
 public class DefaultBuilderDelegate extends AbstractBuilderDelegate<Builder> {
     protected String getBuildMethodName() {
         return "build";

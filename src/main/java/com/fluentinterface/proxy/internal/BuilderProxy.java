@@ -1,9 +1,7 @@
-package com.fluentinterface.proxy;
+package com.fluentinterface.proxy.internal;
 
 import com.fluentinterface.annotation.Constructs;
-import com.fluentinterface.proxy.impl.BestMatchingConstructor;
-import com.fluentinterface.proxy.impl.BuildWithBuilder;
-import com.fluentinterface.proxy.impl.EmptyConstructor;
+import com.fluentinterface.proxy.*;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
@@ -16,7 +14,17 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * A dynamic proxy which will build a bean of the target type upon calls to the implemented builder interface.
+ * A dynamic proxy that implements the Builder pattern, building a target bean and setting its properties according
+ * to how the builder method were called.
+ * <p>
+ * The implemented interface should be designed to adhere to the builder pattern, that is:
+ * <p>
+ * 1) Present a series of single-property methods returning the builder instance for chaining calls. Example: {@code <pre>MyBuilder withName(String name)</pre>}
+ * 2) Have a {@code <pre>build()</pre>} method returning the built object.
+ * <p>
+ * For convenience, a generic {@link com.fluentinterface.builder.Builder} interface is provided by the library.
+ *
+ * @param <T> The interface to dynamically implement.
  */
 public class BuilderProxy<T> implements InvocationHandler {
 

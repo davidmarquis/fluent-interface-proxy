@@ -14,7 +14,7 @@ public class Converters {
     };
 
     @SuppressWarnings("unchecked")
-    public static  Conversions.Convert<String, Enum> stringToEnum() {
+    public static Conversions.Convert<String, Enum> stringToEnum() {
         return (value, target, converter) -> Enum.valueOf(target, value);
     }
 }

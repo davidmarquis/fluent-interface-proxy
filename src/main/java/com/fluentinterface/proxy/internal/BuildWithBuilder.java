@@ -1,14 +1,14 @@
-package com.fluentinterface.proxy.impl;
+package com.fluentinterface.proxy.internal;
 
 import com.fluentinterface.proxy.BuilderDelegate;
 
 import java.util.function.Function;
 
-public class BuildWithBuilder implements Function<Object, Object> {
+class BuildWithBuilder implements Function<Object, Object> {
 
     private BuilderDelegate builderDelegate;
 
-    public BuildWithBuilder(BuilderDelegate builderDelegate) {
+    BuildWithBuilder(BuilderDelegate builderDelegate) {
         this.builderDelegate = builderDelegate;
     }
 

@@ -2,12 +2,12 @@ package com.fluentinterface;
 
 import com.fluentinterface.builder.Builder;
 import com.fluentinterface.proxy.BuilderDelegate;
-import com.fluentinterface.proxy.BuilderProxy;
+import com.fluentinterface.proxy.DefaultBuilderDelegate;
 import com.fluentinterface.proxy.Instantiator;
 import com.fluentinterface.proxy.PropertyAccessStrategy;
-import com.fluentinterface.proxy.impl.DefaultBuilderDelegate;
-import com.fluentinterface.proxy.impl.FieldPropertyAccessStrategy;
-import com.fluentinterface.proxy.impl.SetterPropertyAccessStrategy;
+import com.fluentinterface.proxy.internal.BuilderProxy;
+import com.fluentinterface.proxy.internal.FieldPropertyAccessStrategy;
+import com.fluentinterface.proxy.internal.SetterPropertyAccessStrategy;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
@@ -88,7 +88,7 @@ public class ReflectionBuilder<B> {
     @SuppressWarnings("unchecked")
     public B create() {
         InvocationHandler handler = new BuilderProxy(builderInterface, getBuiltClass(),
-                builderDelegate, propertyAccessStrategy, instantiator);
+                                                     builderDelegate, propertyAccessStrategy, instantiator);
 
         return (B) Proxy.newProxyInstance(
                 builderInterface.getClassLoader(),

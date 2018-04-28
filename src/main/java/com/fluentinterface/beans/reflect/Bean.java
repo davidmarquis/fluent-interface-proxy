@@ -48,7 +48,7 @@ public final class Bean<T> {
      * instance is retrieved from a thread-safe {@link SoftReference} cache.
      *
      * @param beanClass the class or interface to analize
-     * @param <T> the bean's type.
+     * @param <T>       the bean's type.
      * @return a {@link Bean} object describing the target class or interface
      * @throws NullPointerException if the given beanClass parameter is {@code null}
      */

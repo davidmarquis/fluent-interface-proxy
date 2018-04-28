@@ -1,4 +1,4 @@
-package com.fluentinterface.proxy.impl;
+package com.fluentinterface.proxy.internal;
 
 import com.fluentinterface.proxy.BuilderDelegate;
 import com.fluentinterface.proxy.BuilderState;
@@ -16,13 +16,13 @@ import static com.fluentinterface.utils.TypeConversionUtils.translateFromPrimiti
 /**
  * Instantiates objects by finding a constructor on the target Class that matches the provided set of parameters.
  */
-public class BestMatchingConstructor<T> implements Instantiator<T> {
+class BestMatchingConstructor<T> implements Instantiator<T> {
 
     private Class<T> builtClass;
     private BuilderDelegate<?> builderDelegate;
     private Object[] params;
 
-    public BestMatchingConstructor(Class<T> builtClass, BuilderDelegate<?> builderDelegate, Object[] params) {
+    BestMatchingConstructor(Class<T> builtClass, BuilderDelegate<?> builderDelegate, Object[] params) {
         this.builtClass = builtClass;
         this.builderDelegate = builderDelegate;
         this.params = params;
@@ -104,7 +104,8 @@ public class BestMatchingConstructor<T> implements Instantiator<T> {
     /**
      * Checks if a set of types are compatible with the given set of constructor parameter types. If an input type is
      * null, then it is considered as a wildcard for matching purposes, and always matches.
-     * @param paramTypes A set of input types that are to be matched against constructor parameters.
+     *
+     * @param paramTypes            A set of input types that are to be matched against constructor parameters.
      * @param constructorParamTypes The constructor parameters to match against.
      * @return whether the input types are compatible or not.
      */

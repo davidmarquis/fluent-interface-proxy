@@ -1,16 +1,16 @@
-package com.fluentinterface.proxy.impl;
+package com.fluentinterface.proxy.internal;
 
 import com.fluentinterface.proxy.PropertySetter;
 import com.fluentinterface.proxy.PropertyTarget;
 
 import java.util.function.Function;
 
-public class TransformPropertySetter implements PropertySetter {
+class TransformPropertySetter implements PropertySetter {
 
     private String property;
     private Function transformFunction;
 
-    public TransformPropertySetter(String property, Function transformFunction) {
+    TransformPropertySetter(String property, Function transformFunction) {
         this.property = property;
         this.transformFunction = transformFunction;
     }

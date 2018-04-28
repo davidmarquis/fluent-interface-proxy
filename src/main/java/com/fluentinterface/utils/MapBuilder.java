@@ -8,12 +8,12 @@ import java.util.Map;
 /**
  * Utility builder to create a map with a fluent API. Because this builder implements the <pre>{@code Builder<>}</pre> interface, it can
  * be used directly in other builders as parameters, without the need to call `build()`.
- *
+ * <p>
  * Direct usage:
  * <pre>{@code
  * mappingof("key", 2).and("other", 3).build();
  * }</pre>
- *
+ * <p>
  * Usage within other builders:
  * <pre>{@code
  * class Person {
@@ -34,7 +34,8 @@ public class MapBuilder<K, V> implements Builder<Map<K, V>> {
 
     private Map<K, V> built = new HashMap<>();
 
-    private MapBuilder() {}
+    private MapBuilder() {
+    }
 
     private MapBuilder(K initialKey, V initialValue) {
         built.put(initialKey, initialValue);

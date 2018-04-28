@@ -1,8 +1,9 @@
-package com.fluentinterface.proxy;
+package com.fluentinterface.proxy.internal;
 
 import com.fluentinterface.annotation.Sets;
-import com.fluentinterface.proxy.impl.BuildWithBuilder;
-import com.fluentinterface.proxy.impl.TransformPropertySetter;
+import com.fluentinterface.proxy.BuilderDelegate;
+import com.fluentinterface.proxy.PropertyAccessStrategy;
+import com.fluentinterface.proxy.PropertySetter;
 
 import java.lang.reflect.Method;
 import java.util.function.Function;

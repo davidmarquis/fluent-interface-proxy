@@ -34,11 +34,11 @@ public class MapBuilder<K, V> implements Builder<Map<K, V>> {
 
     private Map<K, V> built = new HashMap<>();
 
-    private MapBuilder() {
-    }
+    private MapBuilder() {}
 
-    private MapBuilder(K initialKey, V initialValue) {
-        built.put(initialKey, initialValue);
+    @Override
+    public Map<K, V> build(Object... ignored) {
+        return built;
     }
 
     public MapBuilder<K, V> and(K key, V value) {
@@ -51,16 +51,35 @@ public class MapBuilder<K, V> implements Builder<Map<K, V>> {
         return this;
     }
 
+    private MapBuilder(K initialKey, V initialValue) {
+        built.put(initialKey, initialValue);
+    }
+
     public static <K, V> MapBuilder<K, V> mappingOf(K key, V value) {
         return new MapBuilder<>(key, value);
     }
 
-    public static MapBuilder<Object, Object> map() {
-        return new MapBuilder<>();
+    public static <K, V> MapBuilder<K, V> mapOf(K key, V value) {
+        return mappingOf(key, value);
     }
 
-    @Override
-    public Map<K, V> build(Object... ignored) {
-        return built;
+    public static <K, V> MapBuilder<K, V> mapOf(K k1, V v1, K k2, V v2) {
+        return mappingOf(k1, v1).and(k2, v2);
+    }
+
+    public static <K, V> MapBuilder<K, V> mapOf(K k1, V v1, K k2, V v2, K k3, V v3) {
+        return mappingOf(k1, v1).and(k2, v2).and(k3, v3);
+    }
+
+    public static <K, V> MapBuilder<K, V> mapOf(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
+        return mappingOf(k1, v1).and(k2, v2).and(k3, v3).and(k4, v4);
+    }
+
+    public static <K, V> MapBuilder<K, V> mapOf(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
+        return mappingOf(k1, v1).and(k2, v2).and(k3, v3).and(k4, v4).and(k5, v5);
+    }
+
+    public static MapBuilder<Object, Object> map() {
+        return new MapBuilder<>();
     }
 }

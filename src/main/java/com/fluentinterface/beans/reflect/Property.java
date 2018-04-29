@@ -182,7 +182,7 @@ public final class Property implements AnnotatedElement {
      */
     @Override
     public Annotation[] getAnnotations() {
-        return annotations.values().toArray(new Annotation[annotations.size()]);
+        return annotations.values().toArray(new Annotation[0]);
     }
 
     /**
@@ -202,7 +202,7 @@ public final class Property implements AnnotatedElement {
      */
     @Override
     public Annotation[] getDeclaredAnnotations() {
-        return declaredAnnotations.values().toArray(new Annotation[declaredAnnotations.size()]);
+        return declaredAnnotations.values().toArray(new Annotation[0]);
     }
 
     /**
@@ -403,7 +403,7 @@ public final class Property implements AnnotatedElement {
     public Object get(Object obj) throws ReflectionException {
         try {
             if (isPublic(readMethod)) {
-                return readMethod.invoke(obj, null);
+                return readMethod.invoke(obj);
             } else {
                 throw new ReflectionException("Cannot get the value of " + this + ", as it is write-only.");
             }
@@ -431,7 +431,7 @@ public final class Property implements AnnotatedElement {
     public void set(Object obj, Object value) throws ReflectionException {
         try {
             if (isPublic(writeMethod)) {
-                writeMethod.invoke(obj, new Object[]{value});
+                writeMethod.invoke(obj, value);
             } else {
                 throw new ReflectionException("Cannot set the value of " + this + ", as it is read-only.");
             }

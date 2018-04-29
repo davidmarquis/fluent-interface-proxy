@@ -30,7 +30,9 @@
         <developer>
             <id>davidmarquis</id>
             <name>David Marquis</name>
-            <email>davidmarquis@me.com</email>
+            <email>david@radiant3.ca</email>
+            <organization>Radiant3 inc.</organization>
+            <timezone>America/Montreal</timezone>
         </developer>
     </developers>
 

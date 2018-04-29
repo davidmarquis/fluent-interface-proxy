@@ -15,10 +15,6 @@
  */
 package com.fluentinterface.beans.reflect;
 
-import net.sf.cglib.reflect.FastClass;
-import net.sf.cglib.reflect.FastMethod;
-
-import java.io.PrintStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.HashMap;
@@ -78,9 +74,6 @@ public final class Property implements AnnotatedElement {
     private final Method readMethod;
     private final Method writeMethod;
 
-    private final ProxyMethod proxyReadMethod;
-    private final ProxyMethod proxyWriteMethod;
-
     private final Class<?> type;
     private final Class<?> actualType;
     private final Bean<?> declaringBean;
@@ -137,9 +130,6 @@ public final class Property implements AnnotatedElement {
 
         actualType = candidateActualType;
 
-        // Field and Optional Cglib proxies (from 10% to 20% better performances)
-        proxyReadMethod = (readMethod != null) ? new ProxyMethod(readMethod) : null;
-        proxyWriteMethod = (writeMethod != null) ? new ProxyMethod(writeMethod) : null;
         field = findAccessorField(declaringBean.getType(), name, type);
 
         // Annotations
@@ -413,7 +403,7 @@ public final class Property implements AnnotatedElement {
     public Object get(Object obj) throws ReflectionException {
         try {
             if (isPublic(readMethod)) {
-                return proxyReadMethod.invoke(obj, null);
+                return readMethod.invoke(obj, null);
             } else {
                 throw new ReflectionException("Cannot get the value of " + this + ", as it is write-only.");
             }
@@ -441,7 +431,7 @@ public final class Property implements AnnotatedElement {
     public void set(Object obj, Object value) throws ReflectionException {
         try {
             if (isPublic(writeMethod)) {
-                proxyWriteMethod.invoke(obj, new Object[]{value});
+                writeMethod.invoke(obj, new Object[]{value});
             } else {
                 throw new ReflectionException("Cannot set the value of " + this + ", as it is read-only.");
             }
@@ -523,52 +513,5 @@ public final class Property implements AnnotatedElement {
     @Override
     public String toString() {
         return "property " + declaringBean.getType().getName() + "." + name;
-    }
-
-    /**
-     * Internal: Inner class pattern to avoid the hard dep to Cglib.
-     * <p>
-     * This class will scan the classpath and enables the cglib proxy only if
-     * a valid class is available in net.sf.cglib.reflect.FastMethod location,
-     * otherwise will fallback to the standard java.lang.reflect.Method logic.
-     */
-    private final static class ProxyMethod {
-        private static boolean isCglibPresent = false;
-
-        static {
-            try {
-                isCglibPresent = Class.forName("net.sf.cglib.reflect.FastMethod") != null;
-            } catch (ClassNotFoundException ignored) {
-            }
-        }
-
-        private Method method;
-        private FastMethod fastMethod;
-
-        public ProxyMethod(Method method) {
-            this.method = method;
-
-            if (isCglibPresent) {
-                try {
-                    // Note: getMethod(Method) throws with bridge and private methods,
-                    // printing at the same time some really un-usefull (for the end-user)
-                    // strings to the console, therefore the System.err is temporarily disabled
-                    PrintStream err = System.err;
-
-                    System.setErr(null);
-                    fastMethod = FastClass.create(method.getDeclaringClass()).getMethod(method);
-                    System.setErr(err);
-                } catch (Exception ignored) {
-                }
-            }
-        }
-
-        public Object invoke(Object obj, Object[] args) throws InvocationTargetException, IllegalAccessException {
-            if (isCglibPresent && fastMethod != null) {
-                return fastMethod.invoke(obj, args);
-            } else {
-                return method.invoke(obj, args);
-            }
-        }
     }
 }

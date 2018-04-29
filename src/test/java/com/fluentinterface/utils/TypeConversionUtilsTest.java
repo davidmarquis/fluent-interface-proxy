@@ -3,21 +3,19 @@ package com.fluentinterface.utils;
 import org.junit.Test;
 
 import static com.fluentinterface.utils.TypeConversionUtils.translateFromPrimitive;
-import static junit.framework.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class TypeConversionUtilsTest {
 
     @Test
     public void testTranslateFromPrimitiveSupportedConversions() {
-
-        // not using Hamcrest matchers due to generics explicit typing obscuring test
-        assertTrue(translateFromPrimitive(boolean.class).equals(Boolean.class));
-        assertTrue(translateFromPrimitive(byte.class).equals(Byte.class));
-        assertTrue(translateFromPrimitive(short.class).equals(Short.class));
-        assertTrue(translateFromPrimitive(char.class).equals(Character.class));
-        assertTrue(translateFromPrimitive(int.class).equals(Integer.class));
-        assertTrue(translateFromPrimitive(long.class).equals(Long.class));
-        assertTrue(translateFromPrimitive(float.class).equals(Float.class));
-        assertTrue(translateFromPrimitive(double.class).equals(Double.class));
+        assertThat("boolean", translateFromPrimitive(boolean.class).equals(Boolean.class));
+        assertThat("byte", translateFromPrimitive(byte.class).equals(Byte.class));
+        assertThat("short", translateFromPrimitive(short.class).equals(Short.class));
+        assertThat("char", translateFromPrimitive(char.class).equals(Character.class));
+        assertThat("int", translateFromPrimitive(int.class).equals(Integer.class));
+        assertThat("long", translateFromPrimitive(long.class).equals(Long.class));
+        assertThat("float", translateFromPrimitive(float.class).equals(Float.class));
+        assertThat("double", translateFromPrimitive(double.class).equals(Double.class));
     }
 }

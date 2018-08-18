@@ -1,4 +1,4 @@
-package com.fluentinterface.domain;
+package com.fluentinterface.examples;
 
 import java.util.List;
 import java.util.Queue;

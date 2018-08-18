@@ -1,7 +1,7 @@
 package com.fluentinterface;
 
 import com.fluentinterface.builder.Builder;
-import com.fluentinterface.domain.Person;
+import com.fluentinterface.examples.Person;
 import org.junit.Test;
 
 import java.io.Serializable;

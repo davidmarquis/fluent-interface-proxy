@@ -1,8 +1,8 @@
 package com.fluentinterface;
 
-import com.fluentinterface.domain.Person;
-import com.fluentinterface.domain.TypedStringID;
-import com.fluentinterface.domain.TypedStringIDBuilder;
+import com.fluentinterface.examples.Person;
+import com.fluentinterface.examples.TypedStringID;
+import com.fluentinterface.examples.TypedStringIDBuilder;
 import org.junit.Test;
 
 import static com.fluentinterface.ReflectionBuilder.implementationFor;

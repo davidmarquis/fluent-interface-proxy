@@ -1,4 +1,4 @@
-package com.fluentinterface.domain;
+package com.fluentinterface.examples;
 
 import com.fluentinterface.annotation.Sets;
 import com.fluentinterface.builder.Builder;

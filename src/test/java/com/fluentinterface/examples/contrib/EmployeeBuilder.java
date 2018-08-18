@@ -1,0 +1,1 @@
+package com.fluentinterface.examples.contrib;import com.fluentinterface.builder.Builder;public interface EmployeeBuilder          extends HumanCommonBuilder<EmployeeBuilder>,                 Builder<Employee> {	EmployeeBuilder withDepartment(final String department);		EmployeeBuilder withSalary(final double salary);}

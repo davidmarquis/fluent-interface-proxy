@@ -1,9 +1,9 @@
 package com.fluentinterface;
 
-import com.fluentinterface.domain.Person;
+import com.fluentinterface.examples.Person;
 import org.junit.Test;
 
-import static com.fluentinterface.domain.PersonAnnotatedBuilder.aPerson;
+import static com.fluentinterface.examples.PersonAnnotatedBuilder.aPerson;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 

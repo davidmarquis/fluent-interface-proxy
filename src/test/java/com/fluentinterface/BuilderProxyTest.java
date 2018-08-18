@@ -1,7 +1,7 @@
 package com.fluentinterface;
 
-import com.fluentinterface.domain.Person;
-import com.fluentinterface.domain.PersonBuilder;
+import com.fluentinterface.examples.Person;
+import com.fluentinterface.examples.PersonBuilder;
 import com.fluentinterface.proxy.PropertyAccessStrategy;
 import com.fluentinterface.proxy.internal.FieldPropertyAccessStrategy;
 import com.fluentinterface.proxy.internal.SetterPropertyAccessStrategy;

@@ -1,4 +1,4 @@
-package com.fluentinterface.domain;
+package com.fluentinterface.examples;
 
 /**
  * TypedStringID is used to assure proper setting of values at compilation time.
